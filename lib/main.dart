@@ -1,18 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:xorr/features/auth/wrappers/auth_wrapper.dart';
+import 'package:xorr/shared/theme/app_themes.dart';
 
-void main(){
-  runApp(Xorr());
+void main() {
+  runApp(ProviderScope(child: Xorr()));
 }
-
 
 class Xorr extends StatelessWidget {
   const new({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-
+      home: AuthWrapper(),
+      theme: AppThemes.lightTheme,
+      darkTheme: AppThemes.darkTheme,
+      themeMode: .system,
+      title: "Xorr Desktop",
     );
   }
 }
