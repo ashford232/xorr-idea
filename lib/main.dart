@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:xorr/config/startup_config.dart';
 import 'package:xorr/features/auth/wrappers/auth_wrapper.dart';
 import 'package:xorr/shared/theme/app_themes.dart';
 
-void main() {
-  runApp(ProviderScope(child: Xorr()));
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await StartupConfig.setWindow();
+  runApp(const ProviderScope(child: Xorr()));
 }
 
 class Xorr extends StatelessWidget {
@@ -14,7 +17,7 @@ class Xorr extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: AuthWrapper(),
+      home: const AuthWrapper(),
       theme: AppThemes.lightTheme,
       darkTheme: AppThemes.darkTheme,
       themeMode: .system,

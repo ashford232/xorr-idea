@@ -8,6 +8,7 @@ abstract class AppThemes {
     useMaterial3: true,
     fontFamily: AppFonts.manrope,
     brightness: Brightness.light,
+    scaffoldBackgroundColor: AppColors.lightSurface,
     colorScheme: ColorScheme(
       brightness: Brightness.light,
 
@@ -71,6 +72,8 @@ abstract class AppThemes {
     useMaterial3: true,
     fontFamily: AppFonts.manrope,
     brightness: Brightness.dark,
+    scaffoldBackgroundColor: AppColors.darkSurface,
+
     colorScheme: ColorScheme(
       brightness: Brightness.dark,
 
@@ -128,5 +131,6 @@ abstract class AppThemes {
       // Scrim
       scrim: Colors.black,
     ),
+    
   );
 }
