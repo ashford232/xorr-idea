@@ -45,6 +45,10 @@ dependencies:
   appflowy_editor: ^6.2.0
   file_picker: ^10.3.10
   path_provider: ^2.1.6
+  http: ^1.6.0
+  image_picker: ^1.2.3
+  cached_network_image: ^4.0.0
+  
 
 dev_dependencies:
   flutter_test:
@@ -86,12 +90,15 @@ flutter:
   # list giving the asset and other descriptors for the font. For
   # example:
   fonts:
-    - family: Manrope
+    - family: Inter
       fonts:
-        - asset: assets/fonts/manrope.ttf
+        - asset: assets/fonts/inter.ttf
     - family: SourceSerif4
       fonts:
         - asset: assets/fonts/source-serif4.ttf
+    - family: Geist
+      fonts:
+        - asset: assets/fonts/geist.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

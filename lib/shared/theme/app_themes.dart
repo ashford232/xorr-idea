@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:xorr/shared/extensions/extensions.dart';
+import 'package:xorr/shared/extensions/functions.dart';
 import 'package:xorr/shared/theme/app_colors.dart';
 import 'package:xorr/shared/theme/app_fonts.dart';
 
 abstract class AppThemes {
   static final lightTheme = ThemeData(
     useMaterial3: true,
-    fontFamily: AppFonts.manrope,
+    fontFamily: AppFonts.geist,
     brightness: Brightness.light,
     scaffoldBackgroundColor: AppColors.lightSurface,
     colorScheme: ColorScheme(
@@ -14,25 +14,25 @@ abstract class AppThemes {
 
       // Primary
       primary: AppColors.primary,
-      onPrimary: Extensions.textColorFor(AppColors.primary),
+      onPrimary: Functions.textColorFor(AppColors.primary),
       primaryContainer: AppColors.lightSurfaceContainerHigh,
       onPrimaryContainer: AppColors.lightText,
 
       // Secondary
       secondary: AppColors.secondary,
-      onSecondary: Extensions.textColorFor(AppColors.secondary),
+      onSecondary: Functions.textColorFor(AppColors.secondary),
       secondaryContainer: AppColors.lightSurfaceContainerHigh,
       onSecondaryContainer: AppColors.lightText,
 
       // Tertiary
       tertiary: AppColors.info,
-      onTertiary: Extensions.textColorFor(AppColors.info),
+      onTertiary: Functions.textColorFor(AppColors.info),
       tertiaryContainer: AppColors.lightSurfaceContainerHigh,
       onTertiaryContainer: AppColors.lightText,
 
       // Error
       error: AppColors.error,
-      onError: Extensions.textColorFor(AppColors.error),
+      onError: Functions.textColorFor(AppColors.error),
       errorContainer: AppColors.lightSurfaceContainerHigh,
       onErrorContainer: AppColors.lightText,
 
@@ -40,16 +40,11 @@ abstract class AppThemes {
       surface: AppColors.lightSurface,
       onSurface: AppColors.lightText,
 
-      surfaceContainerLowest:
-          AppColors.lightSurfaceContainerLowest,
-      surfaceContainerLow:
-          AppColors.lightSurfaceContainerLow,
-      surfaceContainer:
-          AppColors.lightSurfaceContainer,
-      surfaceContainerHigh:
-          AppColors.lightSurfaceContainerHigh,
-      surfaceContainerHighest:
-          AppColors.lightSurfaceContainerHighest,
+      surfaceContainerLowest: AppColors.lightSurfaceContainerLowest,
+      surfaceContainerLow: AppColors.lightSurfaceContainerLow,
+      surfaceContainer: AppColors.lightSurfaceContainer,
+      surfaceContainerHigh: AppColors.lightSurfaceContainerHigh,
+      surfaceContainerHighest: AppColors.lightSurfaceContainerHighest,
 
       // Surface variant
       onSurfaceVariant: AppColors.lightTextSecondary,
@@ -70,7 +65,7 @@ abstract class AppThemes {
 
   static final darkTheme = ThemeData(
     useMaterial3: true,
-    fontFamily: AppFonts.manrope,
+    fontFamily: AppFonts.geist,
     brightness: Brightness.dark,
     scaffoldBackgroundColor: AppColors.darkSurface,
 
@@ -79,25 +74,25 @@ abstract class AppThemes {
 
       // Primary
       primary: AppColors.primary,
-      onPrimary: Extensions.textColorFor(AppColors.primary),
+      onPrimary: Functions.textColorFor(AppColors.primary),
       primaryContainer: AppColors.darkSurfaceContainerHigh,
       onPrimaryContainer: AppColors.darkText,
 
       // Secondary
       secondary: AppColors.secondary,
-      onSecondary: Extensions.textColorFor(AppColors.secondary),
+      onSecondary: Functions.textColorFor(AppColors.secondary),
       secondaryContainer: AppColors.darkSurfaceContainerHigh,
       onSecondaryContainer: AppColors.darkText,
 
       // Tertiary
       tertiary: AppColors.info,
-      onTertiary: Extensions.textColorFor(AppColors.info),
+      onTertiary: Functions.textColorFor(AppColors.info),
       tertiaryContainer: AppColors.darkSurfaceContainerHigh,
       onTertiaryContainer: AppColors.darkText,
 
       // Error
       error: AppColors.error,
-      onError: Extensions.textColorFor(AppColors.error),
+      onError: Functions.textColorFor(AppColors.error),
       errorContainer: AppColors.darkSurfaceContainerHigh,
       onErrorContainer: AppColors.darkText,
 
@@ -105,16 +100,11 @@ abstract class AppThemes {
       surface: AppColors.darkSurface,
       onSurface: AppColors.darkText,
 
-      surfaceContainerLowest:
-          AppColors.darkSurfaceContainerLowest,
-      surfaceContainerLow:
-          AppColors.darkSurfaceContainerLow,
-      surfaceContainer:
-          AppColors.darkSurfaceContainer,
-      surfaceContainerHigh:
-          AppColors.darkSurfaceContainerHigh,
-      surfaceContainerHighest:
-          AppColors.darkSurfaceContainerHighest,
+      surfaceContainerLowest: AppColors.darkSurfaceContainerLowest,
+      surfaceContainerLow: AppColors.darkSurfaceContainerLow,
+      surfaceContainer: AppColors.darkSurfaceContainer,
+      surfaceContainerHigh: AppColors.darkSurfaceContainerHigh,
+      surfaceContainerHighest: AppColors.darkSurfaceContainerHighest,
 
       // Surface variant
       onSurfaceVariant: AppColors.darkTextSecondary,
@@ -131,6 +121,5 @@ abstract class AppThemes {
       // Scrim
       scrim: Colors.black,
     ),
-    
   );
 }

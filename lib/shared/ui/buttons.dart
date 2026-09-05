@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:xorr/shared/extensions/extensions.dart';
+import 'package:xorr/shared/extensions/functions.dart';
 import 'package:xorr/shared/theme/app_colors.dart';
 import 'package:xorr/shared/ui/loaders.dart';
 
@@ -14,7 +14,7 @@ FilledButton appButton({
 
     style: FilledButton.styleFrom(
       minimumSize: size ?? Size(.infinity, 48),
-      shape: RoundedRectangleBorder(borderRadius: .circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: .circular(5)),
     ),
     child: Row(
       mainAxisAlignment: .center,
@@ -24,7 +24,7 @@ FilledButton appButton({
           appLoader(
             size: 15,
             strokeWidth: 2,
-            color: Extensions.textColorFor(AppColors.primary),
+            color: Functions.textColorFor(AppColors.primary),
           ),
           const SizedBox(width: 10),
         ],
