@@ -1,0 +1,52 @@
+version: '3.8'
+
+services:
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@xorr.com      
+      PGADMIN_DEFAULT_PASSWORD: adminpassword     
+    ports:
+      - "5050:80"                                
+    depends_on:
+      - postgres
+      
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: xorr
+      POSTGRES_DB: xorr
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      DB_HOST: postgres
+      DB_USER: postgres
+      DB_PASSWORD: xorr
+      DB_NAME: xorr
+      DB_PORT: 5432
+      JWT_SECRET: xorrjwtkey
+
+      R2_ACCOUNT_ID: 9f9fb8f3df29eb90a19c40beb9335642
+      R2_ACCESS_KEY_ID: 6d18a1eec50c246a1599b77b96f8fa51
+      R2_SECRET_ACCESS_KEY: ecb6413ce05c95f8eb8713899907f0fe881368502efcee6b1fbefc039401246e
+      R2_BUCKET: xorr-media
+      
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+volumes:
+  postgres_data:
