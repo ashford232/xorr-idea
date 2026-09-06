@@ -51,6 +51,9 @@ class Sidebar extends ConsumerWidget {
                     : () {
                         ref.read(navigationStateProvider.notifier).clearNav();
                       },
+                iconColor: navigationState.currentItem == null
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurfaceVariant,
               ),
               userSync.when(
                 data: (user) {
@@ -143,6 +146,7 @@ class Sidebar extends ConsumerWidget {
                   text: 'Login',
                   icon: CupertinoIcons.person,
                   toggled: toggled,
+                  iconColor: theme.colorScheme.onSurfaceVariant,
                   onPressed: () {
                     AppRouter.push(LoginView());
                   },
@@ -162,25 +166,6 @@ class Sidebar extends ConsumerWidget {
                           ref.read(authRepositoryProvider).logout();
                         },
                       ),
-                      const SizedBox(height: 8),
-                      Align(
-                        alignment: toggled
-                            ? Alignment.center
-                            : Alignment.centerRight,
-                        child: IconButton(
-                          tooltip: toggled
-                              ? 'Expand Sidebar'
-                              : 'Collapse Sidebar',
-                          onPressed: () {
-                            ref.read(navigationStateProvider.notifier).toggle();
-                          },
-                          icon: Icon(
-                            toggled
-                                ? CupertinoIcons.sidebar_left
-                                : CupertinoIcons.sidebar_right,
-                          ),
-                        ),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -189,6 +174,21 @@ class Sidebar extends ConsumerWidget {
             },
             error: (_, _) => const SizedBox.shrink(),
             loading: () => const SizedBox.shrink(),
+          ),
+          const SizedBox(height: 8),
+          Align(
+            alignment: toggled ? Alignment.center : Alignment.centerRight,
+            child: IconButton(
+              tooltip: toggled ? 'Expand Sidebar' : 'Collapse Sidebar',
+              onPressed: () {
+                ref.read(navigationStateProvider.notifier).toggle();
+              },
+              icon: Icon(
+                toggled
+                    ? CupertinoIcons.sidebar_left
+                    : CupertinoIcons.sidebar_right,
+              ),
+            ),
           ),
         ],
       ),
