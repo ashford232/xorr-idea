@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 
-class FavoritesView extends StatefulWidget {
+class StarredView extends StatefulWidget {
   const new({super.key});
 
   @override
-  State<FavoritesView> createState() => _FavoritesViewState();
+  State<StarredView> createState() => _StarredViewState();
 }
 
-class _FavoritesViewState extends State<FavoritesView> {
+class _StarredViewState extends State<StarredView> {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(backgroundColor: theme.colorScheme.surfaceContainer);
+    return Scaffold();
   }
 }

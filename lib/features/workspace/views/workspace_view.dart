@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class RecentView extends StatelessWidget {
+class WorkspaceView extends StatelessWidget {
   const new({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold();
+    return const Scaffold();
   }
 }

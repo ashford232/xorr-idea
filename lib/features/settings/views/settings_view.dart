@@ -10,8 +10,6 @@ class SettingsView extends StatefulWidget {
 class _SettingsViewState extends State<SettingsView> {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
-    return Scaffold(backgroundColor: theme.colorScheme.surfaceContainer);
+    return Scaffold();
   }
 }

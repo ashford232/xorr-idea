@@ -5,7 +5,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:xorr/features/auth/models/user_model.dart';
 import 'package:xorr/features/auth/provider/auth_provider.dart';
+import 'package:xorr/features/auth/wrappers/auth_wrapper.dart';
 import 'package:xorr/shared/consts/app_consts.dart';
+import 'package:xorr/shared/extensions/app_router.dart';
 import 'package:xorr/shared/ui/buttons.dart';
 import 'package:xorr/shared/ui/dialogs.dart';
 import 'package:xorr/shared/ui/text_fields.dart';
@@ -217,6 +219,7 @@ class _SetupViewState extends ConsumerState<SetupView> {
         if (mounted) {
           if (result.status == true) {
             ref.invalidate(getUserProvider);
+            AppRouter.to(AuthWrapper());
           } else {
             DesktopDialogs.error(
               context,

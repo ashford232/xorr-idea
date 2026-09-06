@@ -1,14 +1,15 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter/material.dart';
 import 'package:xorr/features/home/models/navigation_item.dart';
 import 'package:xorr/features/settings/views/settings_view.dart';
 import 'package:xorr/features/workspace/views/archive_view.dart';
+import 'package:xorr/features/workspace/views/local_workspace_view.dart';
 import 'package:xorr/features/workspace/views/new_idea_view.dart';
 import 'package:xorr/features/workspace/views/notifications_view.dart';
 import 'package:xorr/features/workspace/views/favorites_view.dart';
 import 'package:xorr/features/workspace/views/recent_view.dart';
 import 'package:xorr/features/workspace/views/search_view.dart';
 import 'package:xorr/features/workspace/views/trash_view.dart';
+import 'package:xorr/features/workspace/views/workspace_view.dart';
 
 class DefaultNavigationData {
   static List<NavigationItem> get getDefaultItems => _defaultItems;
@@ -40,18 +41,16 @@ class DefaultNavigationData {
     NavigationItem(
       id: 1,
       type: .user,
-      name: "Favorites",
-      icon: CupertinoIcons.heart_fill,
-      color: Colors.red,
-      page: FavoritesView(),
+      name: "Starred",
+      icon: CupertinoIcons.star,
+      page: StarredView(),
     ),
 
     NavigationItem(
       id: 2,
       type: .user,
       name: "Archive",
-      color: Colors.blueAccent,
-      icon: CupertinoIcons.archivebox_fill,
+      icon: CupertinoIcons.archivebox,
       page: ArchiveView(),
     ),
 
@@ -59,8 +58,7 @@ class DefaultNavigationData {
       id: 3,
       type: .user,
       name: "Trash",
-      icon: CupertinoIcons.trash_fill,
-      color: Colors.red,
+      icon: CupertinoIcons.trash,
 
       page: TrashView(),
     ),
@@ -69,7 +67,7 @@ class DefaultNavigationData {
       id: 4,
       type: .system,
       name: "Notifications",
-      icon: CupertinoIcons.bell_fill,
+      icon: CupertinoIcons.bell,
       page: NotificationsView(),
     ),
 
@@ -77,9 +75,25 @@ class DefaultNavigationData {
       id: 5,
       type: .system,
       name: "Settings",
-      icon: CupertinoIcons.gear_alt_fill,
+      icon: CupertinoIcons.gear,
       emoji: null,
       page: SettingsView(),
     ),
   ];
+
+  static final NavigationItem workspace = NavigationItem(
+    id: 8,
+    type: .user,
+    name: 'Workspace',
+    icon: CupertinoIcons.square_stack_3d_up,
+    page: WorkspaceView(),
+  );
+
+  static final NavigationItem localWorkspace = NavigationItem(
+    id: 9,
+    type: .user,
+    name: 'Local',
+    icon: CupertinoIcons.folder,
+    page: LocalWorkspaceView(),
+  );
 }

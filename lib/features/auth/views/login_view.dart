@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xorr/features/auth/provider/auth_provider.dart';
 import 'package:xorr/features/auth/views/signup_view.dart';
+import 'package:xorr/features/auth/wrappers/auth_wrapper.dart';
+import 'package:xorr/features/home/widgets/sidebar.dart';
 import 'package:xorr/shared/consts/app_consts.dart';
 import 'package:xorr/shared/consts/utils.dart';
 import 'package:xorr/shared/extensions/app_router.dart';
@@ -55,6 +57,15 @@ class _LoginViewState extends ConsumerState<LoginView> {
                               crossAxisAlignment: .start,
                               mainAxisAlignment: .center,
                               children: [
+                                SidebarCard(
+                                  text: 'Continue without account',
+                                  icon: Icons.arrow_forward,
+                                  toggled: false,
+                                  onPressed: () {
+                                    AppRouter.to(AuthWrapper());
+                                  },
+                                ),
+                                const SizedBox(height: 20),
                                 Text(
                                   AppConsts.appName,
                                   style: theme.textTheme.displayLarge?.copyWith(
@@ -201,6 +212,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
       if (mounted) {
         if (result.user != null) {
           ref.invalidate(getUserProvider);
+          AppRouter.to(AuthWrapper());
         } else {
           DesktopDialogs.error(
             context,

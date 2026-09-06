@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class RecentView extends StatelessWidget {
+class LocalWorkspaceView extends StatelessWidget {
   const new({super.key});
 
   @override

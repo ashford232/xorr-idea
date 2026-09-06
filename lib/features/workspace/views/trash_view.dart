@@ -10,7 +10,6 @@ class TrashView extends StatefulWidget {
 class _TrashViewState extends State<TrashView> {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(backgroundColor: theme.colorScheme.surfaceContainer);
+    return Scaffold();
   }
 }

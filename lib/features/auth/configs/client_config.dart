@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -29,6 +30,9 @@ class Client {
     } on TimeoutException catch (err) {
       debugPrint(err.toString());
       throw Exception("Something went wrong, please try again");
+    } on SocketException catch (err) {
+      debugPrint(err.toString());
+      throw Exception("Internal server error, please try again");
     }
   }
 
@@ -43,33 +47,42 @@ class Client {
           .timeout(_timeout);
     } on TimeoutException catch (err) {
       debugPrint(err.toString());
-      throw Exception("Something went wrong, please try again");
+      throw ("Something went wrong, please try again");
+    } on SocketException catch (err) {
+      debugPrint(err.toString());
+      throw ("Internal server error, please try again");
     }
   }
 
   Future<http.Response> put(String path, {Map<String, dynamic>? body}) async {
-    try{
-    return await http
-        .put(
-          Uri.parse('$baseUrl$path'),
-          headers: await _headers(),
-          body: body != null ? jsonEncode(body) : null,
-        )
-        .timeout(_timeout);
-    }on TimeoutException catch (err) {
+    try {
+      return await http
+          .put(
+            Uri.parse('$baseUrl$path'),
+            headers: await _headers(),
+            body: body != null ? jsonEncode(body) : null,
+          )
+          .timeout(_timeout);
+    } on TimeoutException catch (err) {
       debugPrint(err.toString());
-      throw Exception("Something went wrong, please try again");
+      throw ("Something went wrong, please try again");
+    } on SocketException catch (err) {
+      debugPrint(err.toString());
+      throw ("Internal server error, please try again");
     }
   }
 
   Future<http.Response> delete(String path) async {
-    try{
-    return await http
-        .delete(Uri.parse('$baseUrl$path'), headers: await _headers())
-        .timeout(_timeout);
-    }on TimeoutException catch (err) {
+    try {
+      return await http
+          .delete(Uri.parse('$baseUrl$path'), headers: await _headers())
+          .timeout(_timeout);
+    } on TimeoutException catch (err) {
       debugPrint(err.toString());
-      throw Exception("Something went wrong, please try again");
+      throw ("Something went wrong, please try again");
+    } on SocketException catch (err) {
+      debugPrint(err.toString());
+      throw ("Internal server error, please try again");
     }
   }
 }

@@ -24,7 +24,7 @@ class Xorr extends ConsumerWidget {
       home: const AuthWrapper(),
       theme: AppThemes.lightTheme,
       darkTheme: AppThemes.darkTheme,
-      themeMode: .light,
+      themeMode: .system,
       title: "Xorr IDEA",
     );
   }

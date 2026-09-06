@@ -10,7 +10,6 @@ class ArchiveView extends StatefulWidget {
 class _ArchiveViewState extends State<ArchiveView> {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(backgroundColor: theme.colorScheme.surfaceContainer);
+    return Scaffold();
   }
 }

@@ -10,7 +10,6 @@ class NotificationsView extends StatefulWidget {
 class _NotificationsViewState extends State<NotificationsView> {
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(backgroundColor: theme.colorScheme.surfaceContainer);
+    return Scaffold();
   }
 }

@@ -10,11 +10,6 @@ class MainContent extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final navigationState = ref.watch(navigationStateProvider);
 
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        child: navigationState.currentItem?.page ?? DefaultView(),
-      ),
-    );
+    return navigationState.currentItem?.page ?? DefaultView();
   }
 }

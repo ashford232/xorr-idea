@@ -8,7 +8,15 @@ class NavigationNotifier extends Notifier<NavigationState> {
     return NavigationState.defaultState;
   }
 
+  void toggle() {
+    state = state.copyWith(toggled: !state.toggled);
+  }
+
   void chnageNav(NavigationItem nav) {
     state = state.copyWith(currentItem: nav);
+  }
+
+  void clearNav() {
+    state = NavigationState.defaultState.copyWith(toggled: state.toggled);
   }
 }
