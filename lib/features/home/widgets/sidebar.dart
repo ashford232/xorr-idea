@@ -22,39 +22,76 @@ class Sidebar extends ConsumerWidget {
     final bool toggled = navigationState.toggled;
     final userSync = ref.watch(getUserProvider);
 
+    final defaultActions = navigationState.defaultActions;
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeInOutCubic,
-      width: toggled ? 50.0 : 220.0,
+      width: toggled ? 57.0 : 220.0,
       height: double.infinity,
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surfaceContainer,
-        border: Border(
-          right: BorderSide(
-            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.5),
-            width: 1,
-          ),
-        ),
-      ),
+      decoration: BoxDecoration(color: theme.colorScheme.surfaceContainer),
       child: Column(
         crossAxisAlignment: .start,
         children: [
           Column(
             children: [
-              SidebarCard(
-                text: AppConsts.appName,
-                icon: CupertinoIcons.lightbulb,
-                toggled: toggled,
-                isSelected: navigationState.currentItem == null ? true : false,
-                onPressed: navigationState.currentItem == null
-                    ? null
-                    : () {
-                        ref.read(navigationStateProvider.notifier).clearNav();
-                      },
-                iconColor: navigationState.currentItem == null
-                    ? theme.colorScheme.primary
-                    : theme.colorScheme.onSurfaceVariant,
-              ),
+              if (!toggled)
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 5,
+                    horizontal: 10,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: .end,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          AppConsts.appName,
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            fontWeight: .bold,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: SizedBox(
+                          height: 30,
+                          child: ListView.separated(
+                            separatorBuilder: (context, index) =>
+                                const SizedBox(width: 5),
+                            scrollDirection: .horizontal,
+                            itemBuilder: (context, index) {
+                              final action = defaultActions[index];
+
+                              return Tooltip(
+                                message: action.name,
+                                child: Material(
+                                  color: Colors.transparent,
+                                  child: InkWell(
+                                    borderRadius: .circular(5),
+                                    onTap: () {},
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 5,
+                                      ),
+                                      child: Icon(
+                                        action.icon,
+                                        size: 20,
+                                        color:
+                                            theme.colorScheme.onSurfaceVariant,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                            itemCount: defaultActions.length,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
               userSync.when(
                 data: (user) {
                   if (user.user == null) {
@@ -74,11 +111,7 @@ class Sidebar extends ConsumerWidget {
                     icon: workspace.icon!,
                     toggled: toggled,
                     isSelected: currentNavId == workspace.id,
-                    iconColor:
-                        workspace.color ??
-                        (workspace.id == currentNavId
-                            ? theme.colorScheme.primary
-                            : theme.colorScheme.onSurfaceVariant),
+
                     onPressed: () {
                       ref
                           .read(navigationStateProvider.notifier)
@@ -123,11 +156,7 @@ class Sidebar extends ConsumerWidget {
                   icon: nav.icon ?? Icons.circle_outlined,
                   toggled: toggled,
                   isSelected: isSelected,
-                  iconColor:
-                      nav.color ??
-                      (isSelected
-                          ? theme.colorScheme.primary
-                          : theme.colorScheme.onSurfaceVariant),
+
                   onPressed: isSelected
                       ? null
                       : () {
@@ -146,7 +175,6 @@ class Sidebar extends ConsumerWidget {
                   text: 'Login',
                   icon: CupertinoIcons.person,
                   toggled: toggled,
-                  iconColor: theme.colorScheme.onSurfaceVariant,
                   onPressed: () {
                     AppRouter.push(LoginView());
                   },
@@ -160,7 +188,6 @@ class Sidebar extends ConsumerWidget {
                         text: 'Logout',
                         icon: Icons.logout,
                         toggled: toggled,
-                        iconColor: theme.colorScheme.error,
                         onPressed: () {
                           ref.invalidate(getUserProvider);
                           ref.read(authRepositoryProvider).logout();
@@ -175,7 +202,6 @@ class Sidebar extends ConsumerWidget {
             error: (_, _) => const SizedBox.shrink(),
             loading: () => const SizedBox.shrink(),
           ),
-          const SizedBox(height: 8),
           Align(
             alignment: toggled ? Alignment.center : Alignment.centerRight,
             child: IconButton(
@@ -210,11 +236,6 @@ class Sidebar extends ConsumerWidget {
       onPressed: () {
         ref.read(navigationStateProvider.notifier).chnageNav(localWorkspace);
       },
-      iconColor:
-          localWorkspace.color ??
-          (localWorkspace.id == currentNavId
-              ? theme.colorScheme.primary
-              : theme.colorScheme.onSurfaceVariant),
     );
   }
 }
@@ -224,7 +245,6 @@ class SidebarCard extends StatelessWidget {
   final IconData icon;
   final bool toggled;
   final bool isSelected;
-  final Color? iconColor;
   final VoidCallback? onPressed;
 
   const SidebarCard({
@@ -233,7 +253,6 @@ class SidebarCard extends StatelessWidget {
     required this.icon,
     required this.toggled,
     this.isSelected = false,
-    this.iconColor,
     this.onPressed,
   });
 
@@ -260,7 +279,9 @@ class SidebarCard extends StatelessWidget {
                 Icon(
                   icon,
                   size: toggled ? 25 : 20,
-                  color: isSelected ? activeTextColor : iconColor,
+                  color: isSelected
+                      ? theme.colorScheme.primary
+                      : theme.colorScheme.onSurface.withValues(alpha: 0.8),
                 ),
                 if (!toggled) ...[
                   const SizedBox(width: 12),

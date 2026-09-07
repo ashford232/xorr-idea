@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-class RecentView extends StatelessWidget {
+class DraftView extends StatelessWidget {
   const new({super.key});
 
   @override

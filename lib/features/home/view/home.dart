@@ -9,6 +9,7 @@ class Home extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
       body: Row(
         children: [
           Sidebar(),
@@ -16,8 +17,20 @@ class Home extends StatelessWidget {
             child: Column(
               crossAxisAlignment: .start,
               children: [
-                Expanded(child: MainContent()),
-                Divider(height: 1),
+                Expanded(
+                  child: Container(
+                    clipBehavior: .antiAlias,
+                    decoration: BoxDecoration(
+                      color: Theme.of(context).colorScheme.surface,
+                      borderRadius: .only(
+                        topLeft: Radius.circular(15),
+                        bottomLeft: Radius.circular(15),
+                      ),
+                    ),
+                    child: MainContent(),
+                  ),
+                ),
+                //   Divider(height: 1),
                 BottomContent(),
               ],
             ),
