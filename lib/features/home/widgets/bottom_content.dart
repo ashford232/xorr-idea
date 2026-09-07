@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xorr/features/auth/models/user_model.dart';
 import 'package:xorr/features/auth/provider/auth_provider.dart';
+import 'package:xorr/features/home/data/navigation/default_navigation_data.dart';
 import 'package:xorr/features/home/providers/navigation_provider.dart';
 import 'package:xorr/shared/consts/app_consts.dart';
 import 'package:xorr/shared/extensions/cached_image.dart';
@@ -13,6 +14,7 @@ class BottomContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final navigationState = ref.watch(navigationStateProvider);
+    final navigationStateNotifier = ref.watch(navigationStateProvider.notifier);
     final userAsync = ref.watch(getUserProvider);
     final theme = Theme.of(context);
     return Padding(
@@ -30,7 +32,15 @@ class BottomContent extends ConsumerWidget {
               if (user.user == null) {
                 return Text('Local');
               }
-              return _UserProfileTile(userModel: user.user!, onTap: () {});
+              return _UserProfileTile(
+                userModel: user.user!,
+                onTap: () {
+                  final nav = DefaultNavigationData.account;
+                  navigationStateNotifier.chnageNav(
+                    nav.copyWith(emoji: () => user.user?.photoUrl),
+                  );
+                },
+              );
             },
             error: (_, _) => const SizedBox.shrink(),
             loading: () => appLoader(size: 10),

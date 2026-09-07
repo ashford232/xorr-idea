@@ -3,6 +3,7 @@ import 'package:xorr/features/home/models/navigation_action.dart';
 import 'package:xorr/features/home/models/navigation_item.dart';
 import 'package:xorr/features/home/view/default_view.dart';
 import 'package:xorr/features/settings/views/settings_view.dart';
+import 'package:xorr/features/settings/views/user_account.dart';
 import 'package:xorr/features/workspace/views/archive_view.dart';
 import 'package:xorr/features/workspace/views/local_workspace_view.dart';
 import 'package:xorr/features/workspace/views/notifications_view.dart';
@@ -119,5 +120,13 @@ class DefaultNavigationData {
     name: 'Getting Started',
     icon: CupertinoIcons.lightbulb,
     page:DefaultView(),
+  );
+    static final NavigationItem account = NavigationItem(
+    id: 11,
+    type: .system,
+    name: 'User Account',
+    icon: CupertinoIcons.person,
+
+    page:UserAccount(),
   );
 }

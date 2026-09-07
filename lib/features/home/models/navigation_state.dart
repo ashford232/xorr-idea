@@ -44,7 +44,7 @@ class NavigationState {
     currentItem: null,
     toggled: false,
     defaultActions: DefaultNavigationData.getDefaultActions,
-    openedTabs: TabModel.defaultTabs,
-    currentTab: TabModel.currentTab,
+    openedTabs: {},
+    currentTab: null,
   );
 }

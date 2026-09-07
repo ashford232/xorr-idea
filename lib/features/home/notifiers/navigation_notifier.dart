@@ -24,6 +24,7 @@ class NavigationNotifier extends Notifier<NavigationState> {
     addTab(
       TabModel(
         id: nav.id,
+        emoji: nav.emoji,
         icon: nav.icon,
         name: nav.name,
         item: nav.page ?? SystemDefaultView(),
@@ -74,6 +75,7 @@ class NavigationNotifier extends Notifier<NavigationState> {
       DefaultNavigationData.gettingStated,
       DefaultNavigationData.localWorkspace,
       DefaultNavigationData.workspace,
+      DefaultNavigationData.account,
     ];
 
     return all.where((nav) => nav.id == id).firstOrNull;

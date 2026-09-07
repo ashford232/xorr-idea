@@ -4,6 +4,7 @@ import 'package:xorr/features/home/data/navigation/default_navigation_data.dart'
 import 'package:xorr/features/home/models/tab_model.dart';
 import 'package:xorr/features/home/providers/navigation_provider.dart';
 import 'package:xorr/features/home/view/system_default_view.dart';
+import 'package:xorr/shared/extensions/cached_image.dart';
 
 class MainContent extends ConsumerStatefulWidget {
   const new({super.key});
@@ -47,31 +48,34 @@ class _MainContentState extends ConsumerState<MainContent> {
       children: [
         // tabs
 
-        SizedBox(
-          height: 45,
-          child: Padding(
-            padding: const EdgeInsets.all(5.0),
-            child: ListView.separated(
-              separatorBuilder: (context, index) => const SizedBox(width: 5),
-              scrollDirection: .horizontal,
-              itemBuilder: (context, index) {
-                final tab = openedTabs[index];
-                final key = tabKeys.putIfAbsent(tab.id, () => GlobalKey());
+        if (openedTabs.isNotEmpty)
+          SizedBox(
+            height: 45,
+            child: Padding(
+              padding: const EdgeInsets.all(5.0),
+              child: ListView.separated(
+                separatorBuilder: (context, index) => const SizedBox(width: 5),
+                scrollDirection: .horizontal,
+                itemBuilder: (context, index) {
+                  final tab = openedTabs[index];
+                  final key = tabKeys.putIfAbsent(tab.id, () => GlobalKey());
 
-                final bool isCurrent = tab.id == currentTab?.id;
-                return KeyedSubtree(
-                  key: key,
-                  child: tabCard(isCurrent, theme, ref, tab),
-                );
-              },
-              itemCount: openedTabs.length,
+                  final bool isCurrent = tab.id == currentTab?.id;
+                  return KeyedSubtree(
+                    key: key,
+                    child: tabCard(isCurrent, theme, ref, tab),
+                  );
+                },
+                itemCount: openedTabs.length,
+              ),
             ),
           ),
-        ),
         Divider(height: 1),
 
         //tabs view
-        Expanded(child: currentTab?.item ?? SystemDefaultView()),
+        if (openedTabs.isNotEmpty) Expanded(child: currentTab!.item),
+
+        if (openedTabs.isEmpty) Expanded(child: SystemDefaultView()),
       ],
     );
   }
@@ -90,6 +94,7 @@ class _MainContentState extends ConsumerState<MainContent> {
                 DefaultNavigationData.gettingStated,
                 DefaultNavigationData.localWorkspace,
                 DefaultNavigationData.workspace,
+                DefaultNavigationData.account,
               ];
 
               final nav = items.firstWhere((n) => n.id == tab.id);
@@ -103,11 +108,15 @@ class _MainContentState extends ConsumerState<MainContent> {
               ),
               child: Row(
                 children: [
-                  Icon(
-                    tab.icon,
-                    size: 15,
-                    fontWeight: isCurrent ? .w600 : .w300,
-                  ),
+                  if (tab.id == DefaultNavigationData.account.id &&
+                      tab.emoji != null) ...[
+                    cachedImage(imageUrl: tab.emoji!, size: Size(15, 15)),
+                  ] else
+                    Icon(
+                      tab.icon,
+                      size: 15,
+                      fontWeight: isCurrent ? .w600 : .w300,
+                    ),
                   const SizedBox(width: 5),
                   Text(
                     tab.name,

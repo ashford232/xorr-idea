@@ -54,7 +54,7 @@ class DefaultView extends StatelessWidget {
             const SizedBox(height: 32),
 
             Text(
-              'Keyboard shortcuts',
+              'Quick shortcuts',
               style: theme.textTheme.titleMedium?.copyWith(
                 fontWeight: FontWeight.bold,
               ),
@@ -62,23 +62,23 @@ class DefaultView extends StatelessWidget {
 
             const SizedBox(height: 12),
 
-            const _Shortcut(keys: ['Ctrl', 'N'], description: 'New idea'),
-            const _Shortcut(keys: ['Ctrl', 'O'], description: 'Open file'),
-            const _Shortcut(keys: ["Ctrl", " F"], description: 'Find ideas'),
-            const _Shortcut(keys: ['Ctrl', 'S'], description: 'Save'),
-            const _Shortcut(
+            const Shortcut(keys: ['Ctrl', 'N'], description: 'New idea'),
+            const Shortcut(keys: ['Ctrl', 'O'], description: 'Open file'),
+            const Shortcut(keys: ["Ctrl", " F"], description: 'Find ideas'),
+            const Shortcut(keys: ['Ctrl', 'S'], description: 'Save'),
+            const Shortcut(
               keys: ["Ctrl", "Alt", " S"],
               description: 'Open Settings',
             ),
-            const _Shortcut(
+            const Shortcut(
               keys: ["Ctrl", "Alt", " T"],
               description: 'Open Trash',
             ),
-            const _Shortcut(
+            const Shortcut(
               keys: ['Ctrl', 'Alt', 'F'],
               description: 'Open Starred',
             ),
-            const _Shortcut(
+            const Shortcut(
               keys: ['Ctrl', 'Alt', 'A'],
               description: 'Open Archive',
             ),
@@ -89,11 +89,11 @@ class DefaultView extends StatelessWidget {
   }
 }
 
-class _Shortcut extends StatelessWidget {
+class Shortcut extends StatelessWidget {
   final List<String> keys;
   final String description;
 
-  const _Shortcut({required this.keys, required this.description});
+  const Shortcut({super.key, required this.keys, required this.description});
 
   @override
   Widget build(BuildContext context) {
@@ -102,46 +102,53 @@ class _Shortcut extends StatelessWidget {
       return theme.colorScheme.onSurface.withValues(alpha: a ?? 0.7);
     }
 
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: SizedBox(
-        height: 30,
-        child: Row(
-          crossAxisAlignment: .center,
+    return ConstrainedBox(
+      constraints: BoxConstraints(maxWidth: 600),
 
-          children: [
-            SizedBox(
-              child: ListView.separated(
-                separatorBuilder: (context, index) => Align(child: Text(' + ')),
-                shrinkWrap: true,
-                physics: NeverScrollableScrollPhysics(),
-                scrollDirection: .horizontal,
-                itemCount: keys.length,
-                itemBuilder: (context, index) {
-                  final key = keys[index];
-                  return Container(
-                    alignment: .center,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 15,
-                      vertical: 2,
-                    ),
-                    decoration: BoxDecoration(
-                      borderRadius: .circular(10),
-                      color: theme.colorScheme.surfaceContainerHigh,
-                    ),
-                    child: Text(
-                      key,
-                      style: theme.textTheme.labelSmall?.copyWith(
-                        color: onSurface(0.8),
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 8),
+        child: SizedBox(
+          height: 30,
+          child: Row(
+            crossAxisAlignment: .center,
+            mainAxisAlignment: .spaceBetween,
+
+            children: [
+              SizedBox(
+                child: ListView.separated(
+                  separatorBuilder: (context, index) =>
+                      Align(child: Text(' + ')),
+                  shrinkWrap: true,
+                  physics: NeverScrollableScrollPhysics(),
+                  scrollDirection: .horizontal,
+                  itemCount: keys.length,
+                  itemBuilder: (context, index) {
+                    final key = keys[index];
+                    return Container(
+                      alignment: .center,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 15,
+                        vertical: 2,
                       ),
-                    ),
-                  );
-                },
+                      decoration: BoxDecoration(
+                        borderRadius: .circular(4),
+                        color: theme.colorScheme.surfaceContainerHigh,
+                      ),
+                      child: Text(
+                        key,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: onSurface(0.8),
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
-            const SizedBox(width: 20),
-            Text(description),
-          ],
+              const SizedBox(width: 20),
+
+              Text(description),
+            ],
+          ),
         ),
       ),
     );
