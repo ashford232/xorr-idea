@@ -15,6 +15,7 @@ abstract class StartupConfig {
     );
     await windowManager.waitUntilReadyToShow(windowOptions, () async {
       await windowManager.setMinimumSize(const Size(500, 400));
+
       await windowManager.show();
       await windowManager.focus();
     });

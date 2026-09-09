@@ -84,7 +84,6 @@ class _SignupViewState extends ConsumerState<SignupView> {
                                   prefix: Icon(Icons.email_outlined),
                                   controller: _emailController,
                                   hintText: "Enter your email",
-                                  onPressed: () {},
                                   validator: Utils.emailValidator,
                                 ),
                                 const SizedBox(height: 10),
@@ -97,7 +96,6 @@ class _SignupViewState extends ConsumerState<SignupView> {
                                       prefix: Icon(Icons.lock_outline),
                                       controller: _passwordController,
                                       hintText: "Enter a password",
-                                      onPressed: () {},
                                       obscureText: obscuredText,
                                       suffix: GestureDetector(
                                         onTap: () {
@@ -124,7 +122,6 @@ class _SignupViewState extends ConsumerState<SignupView> {
                                       prefix: Icon(Icons.lock_outline),
                                       controller: _confirmPasswordController,
                                       hintText: "Confirm your password",
-                                      onPressed: () {},
                                       obscureText: obscuredText,
                                       suffix: GestureDetector(
                                         onTap: () {

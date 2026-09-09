@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:multi_split_view/multi_split_view.dart';
 import 'package:xorr/features/workspace/widgets/workspace_explorer.dart';
+import 'package:xorr/features/workspace/widgets/workspace_main_view.dart';
 
 class LocalWorkspaceView extends StatefulWidget {
   const LocalWorkspaceView({super.key});
@@ -23,11 +24,7 @@ class _LocalWorkspaceViewState extends State<LocalWorkspaceView> {
         builder: (context, area) => WorkspaceExplorer(),
       ),
 
-      Area(
-        size: 0.75,
-
-        builder: (context, area) => WorkspaceMainView(),
-      ),
+      Area(flex: 1, builder: (context, area) => WorkspaceMainView()),
     ];
     _multiSplitController.addListener(_rebuild);
   }
@@ -57,14 +54,5 @@ class _LocalWorkspaceViewState extends State<LocalWorkspaceView> {
         controller: _multiSplitController,
       ),
     );
-  }
-}
-
-class WorkspaceMainView extends StatelessWidget {
-  const new({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold();
   }
 }

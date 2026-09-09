@@ -11,8 +11,10 @@ import 'package:xorr/features/workspace/notifiers/workspace_notifier.dart';
 import 'package:xorr/features/workspace/provider/workspace_provider.dart';
 import 'package:xorr/features/workspace/widgets/entity_card.dart';
 import 'package:xorr/features/workspace/widgets/workspace_utils.dart';
+import 'package:xorr/shared/extensions/utils.dart';
 import 'package:xorr/shared/ui/buttons.dart';
 import 'package:xorr/shared/ui/loaders.dart';
+import 'package:xorr/shared/ui/text_fields.dart';
 
 class WorkspaceExplorer extends ConsumerStatefulWidget {
   const WorkspaceExplorer({super.key});
@@ -34,7 +36,6 @@ class _WorkspaceExplorerState extends ConsumerState<WorkspaceExplorer> {
   final Set<String> expandedFolders = {};
   final Map<String, List<FileSystemEntity>> folderChildren = {};
 
-  /// Resolves target directory based on currently selected entity
   String _getTargetFolder(WorkspaceState ws) {
     final selectedPath = ws.selectedEntity;
     if (selectedPath == null || selectedPath.isEmpty) {
@@ -64,7 +65,14 @@ class _WorkspaceExplorerState extends ConsumerState<WorkspaceExplorer> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Explorer', style: theme.textTheme.labelLarge),
+                Flexible(
+                  child: Text(
+                    'Explorer',
+                    style: theme.textTheme.labelLarge,
+                    maxLines: 1,
+                    overflow: .ellipsis,
+                  ),
+                ),
                 ActionBtn(name: 'Open', icon: Icons.add, onPressed: openFolder),
               ],
             ),
@@ -132,8 +140,9 @@ class _WorkspaceExplorerState extends ConsumerState<WorkspaceExplorer> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         GestureDetector(
-          onSecondaryTapDown: (details) =>
-              _showContextMenu(context, details.globalPosition, entity),
+          onSecondaryTapDown: (details) async {
+            await _showContextMenu(context, details.globalPosition, entity);
+          },
           child: Row(
             children: [
               Expanded(
@@ -171,55 +180,67 @@ class _WorkspaceExplorerState extends ConsumerState<WorkspaceExplorer> {
     );
   }
 
-  void _showContextMenu(
+  PopupMenuItem<T> popupMenuItem<T>({
+    dynamic value,
+    double? height,
+    required Widget icon,
+    required String text,
+  }) {
+    return PopupMenuItem(
+      height: height ?? 25,
+      value: value,
+      child: Row(children: [icon, const SizedBox(width: 5), Text(text)]),
+    );
+  }
+
+  Future<void> _showContextMenu(
     BuildContext context,
     Offset position,
     FileSystemEntity entity,
-  ) {
-    showMenu(
-      menuPadding: .zero,
-      context: context,
-      position: RelativeRect.fromLTRB(
-        position.dx,
-        position.dy,
-        position.dx,
-        position.dy,
+  ) async {
+    final action = await appPopupMenu<XorrDocAction>(context, position, [
+      popupMenuItem(
+        icon: XorrDocAction.open.icon,
+        text: XorrDocAction.open.label,
+        value: XorrDocAction.open,
       ),
-      items: <PopupMenuEntry>[
-        const PopupMenuItem(height: 22, value: 'open', child: Text('Open')),
-        const PopupMenuItem(height: 22, value: 'rename', child: Text('Rename')),
-        const PopupMenuItem(
-          height: 22,
 
-          value: 'delete',
-          child: Text('Delete', style: TextStyle(color: Colors.red)),
-        ),
-        const PopupMenuItem(
-          height: 22,
-          value: 'properties',
-          child: Text('Properties'),
-        ),
-      ],
-    ).then((action) {
-      if (action != null) _handleEntityAction(action, entity);
-    });
+      popupMenuItem(
+        icon: XorrDocAction.rename.icon,
+        text: XorrDocAction.rename.label,
+        value: XorrDocAction.rename,
+      ),
+
+      popupMenuItem(
+        icon: XorrDocAction.delete.icon,
+        text: XorrDocAction.delete.label,
+        value: XorrDocAction.delete,
+      ),
+      popupMenuItem(
+        icon: XorrDocAction.properties.icon,
+        text: XorrDocAction.properties.label,
+        value: XorrDocAction.properties,
+      ),
+    ]);
+
+    if (action != null) _handleEntityAction(action, entity);
   }
 
   Future<void> _handleEntityAction(
-    String action,
+    XorrDocAction action,
     FileSystemEntity entity,
   ) async {
     switch (action) {
-      case 'open':
+      case XorrDocAction.open:
         _openEntity(entity);
         break;
-      case 'rename':
+      case XorrDocAction.rename:
         await _renameEntity(entity);
         break;
-      case 'delete':
+      case XorrDocAction.delete:
         await _deleteEntity(entity);
         break;
-      case 'properties':
+      case XorrDocAction.properties:
         await _showProperties(entity);
         break;
     }
@@ -386,7 +407,7 @@ class _WorkspaceExplorerState extends ConsumerState<WorkspaceExplorer> {
   }
 
   void _changePath(String path) {
-    workspaceNotifier.changePath(path);
+    workspaceNotifier.changePath(path: path, file: true);
   }
 
   void changeFolder(String path) {
@@ -446,42 +467,74 @@ class _WorkspaceExplorerState extends ConsumerState<WorkspaceExplorer> {
               scrollDirection: Axis.horizontal,
               itemBuilder: (context, index) {
                 final action = defaultActions[index];
-                if (expandedFolders.isEmpty &&
-                    action.action == NavAction.collapseAll) {
-                  return const SizedBox.shrink();
-                }
+
                 return ActionBtn(
                   name: action.name,
                   icon: action.icon,
-                  onPressed: () async {
+
+                  onTapDown: (deatils) async {
+                    final position = deatils.globalPosition;
                     final targetFolder = _getTargetFolder(ws);
-                    final relative = p.relative(
-                      targetFolder,
-                      from: workspace.path,
-                    );
 
                     switch (action.action) {
                       case NavAction.newFile:
-                        final fileName = await showNameDialog(
-                          context: context,
-                          title: 'New File\n$relative/',
-                          hintText: 'File name',
-                        );
-                        if (fileName != null && fileName.isNotEmpty) {
-                          final filePath = p.join(targetFolder, fileName);
-                          await controller.createFile(filePath);
-                          workspaceNotifier.setFolder(targetFolder);
-                          await _refreshFolder(targetFolder);
+                        final action = await appPopupMenu<XorrDocumentType>(
+                          context,
+                          position,
+                          [
+                            popupMenuItem(
+                              icon: XorrDocumentType.doc.icon,
+                              text: XorrDocumentType.doc.name,
+                              value: XorrDocumentType.doc,
+                            ),
 
-                          _changePath(filePath);
-                          refresh();
+                            popupMenuItem(
+                              icon: XorrDocumentType.md.icon,
+                              text: XorrDocumentType.md.name,
+                              value: XorrDocumentType.md,
+                            ),
+                            popupMenuItem(
+                              icon: XorrDocumentType.txt.icon,
+                              text: XorrDocumentType.txt.name,
+                              value: XorrDocumentType.txt,
+                            ),
+                            popupMenuItem(
+                              icon: XorrDocumentType.html.icon,
+                              text: XorrDocumentType.html.name,
+                              value: XorrDocumentType.html,
+                            ),
+                          ],
+                        );
+
+                        if (action == null) {
+                          return;
                         }
 
+                        if (context.mounted) {
+                          final fileName = await showNameDialog(
+                            context: context,
+                            title: action.name,
+                            hintText: 'Name',
+                          );
+
+                          if (fileName != null && fileName.isNotEmpty) {
+                            final filePath = p.join(
+                              targetFolder,
+                              "$fileName${action.extension}",
+                            );
+                            await controller.createFile(filePath);
+                            workspaceNotifier.setFolder(targetFolder);
+                            await _refreshFolder(targetFolder);
+
+                            _changePath(filePath);
+                            refresh();
+                          }
+                        }
                       case NavAction.newFolder:
                         final folderName = await showNameDialog(
                           context: context,
-                          title: 'New Folder\n$targetFolder:',
-                          hintText: 'Folder name',
+                          title: 'New Folder',
+                          hintText: 'Name',
                         );
                         if (folderName != null && folderName.isNotEmpty) {
                           final folderPath = p.join(targetFolder, folderName);
@@ -494,7 +547,7 @@ class _WorkspaceExplorerState extends ConsumerState<WorkspaceExplorer> {
 
                       case NavAction.collapseAll:
                         expandedFolders.clear();
-                        workspaceNotifier.changePath(workspace.path);
+                        workspaceNotifier.changeFolder(workspace.path);
 
                       case NavAction.refresh:
                         refresh();
@@ -551,66 +604,22 @@ Future<String?> showNameDialog({
                   ),
                 ),
                 const SizedBox(height: 14),
-                TextField(
-                  controller: controller,
-                  autofocus: true,
-                  style: const TextStyle(fontSize: 14),
-                  decoration: InputDecoration(
-                    hintText: hintText,
-                    isDense: true,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 10,
-                    ),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(6),
-                    ),
-                  ),
-                  onSubmitted: (_) {
-                    final name = controller.text.trim();
-                    if (name.isNotEmpty) {
-                      Navigator.pop(context, name);
-                    }
-                  },
-                ),
+                appTextField(controller: controller, hintText: hintText),
+
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
-                    SizedBox(
-                      height: 32,
-                      child: TextButton(
-                        style: TextButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                        ),
-                        onPressed: () => Navigator.pop(context),
-                        child: const Text(
-                          'Cancel',
-                          style: TextStyle(fontSize: 13),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    SizedBox(
-                      height: 32,
-                      child: FilledButton(
-                        style: FilledButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                        ),
-                        onPressed: () {
-                          final name = controller.text.trim();
-                          if (name.isNotEmpty) {
-                            Navigator.pop(context, name);
-                          }
-                        },
-                        child: const Text(
-                          'Save',
-                          style: TextStyle(fontSize: 13),
-                        ),
-                      ),
+                    const Spacer(),
+                    appButton(
+                      size: Size(100, 35),
+                      text: 'Create',
+                      onPressed: () {
+                        final name = controller.text.trim();
+                        if (name.isNotEmpty) {
+                          Navigator.pop(context, name);
+                        }
+                      },
                     ),
                   ],
                 ),

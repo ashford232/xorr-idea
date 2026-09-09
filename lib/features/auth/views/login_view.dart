@@ -88,7 +88,6 @@ class _LoginViewState extends ConsumerState<LoginView> {
                                   prefix: Icon(Icons.email_outlined),
                                   controller: _emailController,
                                   hintText: "Enter your email",
-                                  onPressed: () {},
                                   autofillHints: {"email"},
                                   textInputType: .emailAddress,
 
@@ -109,7 +108,7 @@ class _LoginViewState extends ConsumerState<LoginView> {
                                       prefix: Icon(Icons.lock_outline),
                                       controller: _passwordController,
                                       hintText: "Enter your password",
-                                      onPressed: () {},
+                                     
                                       obscureText: obscuredText,
                                       suffix: GestureDetector(
                                         onTap: () {

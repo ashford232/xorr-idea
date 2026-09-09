@@ -25,10 +25,11 @@ class EntityCard extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(4),
+        borderRadius: BorderRadius.circular(6),
         onTap: onTap,
         child: Container(
           decoration: BoxDecoration(
+            borderRadius: .circular(6),
             color: isActive
                 ? Theme.of(context).colorScheme.primaryContainer
                 : null,
@@ -39,36 +40,42 @@ class EntityCard extends StatelessWidget {
             bottom: 4,
             right: 5,
           ),
-          child: Row(
-            children: [
-              if (!isFile)
-                AnimatedRotation(
-                  turns: isExpanded ? 0.25 : 0,
-                  duration: const Duration(milliseconds: 200),
-                  child: const Icon(Icons.chevron_right, size: 18),
-                )
-              else
-                const SizedBox(width: 18),
+          child: Tooltip(
+            exitDuration: const Duration(milliseconds: 1),
+            waitDuration: const Duration(milliseconds: 700),
 
-              const SizedBox(width: 4),
+            message: entityPath,
+            child: Row(
+              children: [
+                if (!isFile)
+                  AnimatedRotation(
+                    turns: isExpanded ? 0.25 : 0,
+                    duration: const Duration(milliseconds: 200),
+                    child: const Icon(Icons.chevron_right, size: 18),
+                  )
+                else
+                  const SizedBox(width: 18),
 
-              FileSystemIcon(
-                isFolder: !isFile,
-                extension: getFileExtension(entityPath),
-                size: 20,
-              ),
+                const SizedBox(width: 4),
 
-              const SizedBox(width: 8),
-
-              Expanded(
-                child: Text(
-                  getEntityName(entityPath),
-                  style: const TextStyle(fontSize: 14),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+                FileSystemIcon(
+                  isFolder: !isFile,
+                  extension: getFileExtension(entityPath),
+                  size: 20,
                 ),
-              ),
-            ],
+
+                const SizedBox(width: 8),
+
+                Expanded(
+                  child: Text(
+                    getEntityName(entityPath),
+                    style: const TextStyle(fontSize: 14),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

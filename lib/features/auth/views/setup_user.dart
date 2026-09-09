@@ -102,7 +102,6 @@ class _SetupViewState extends ConsumerState<SetupView> {
                                 prefix: Icon(Icons.person_outline),
                                 controller: _usernameController,
                                 hintText: "Username",
-                                onPressed: () {},
                                 autofillHints: {AutofillHints.name},
                                 textInputType: .name,
 

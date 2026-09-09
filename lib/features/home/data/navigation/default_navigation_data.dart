@@ -19,7 +19,7 @@ class DefaultNavigationData {
     NavigationAction(
       id: 1,
       name: "New File",
-      icon: CupertinoIcons.doc,
+      icon: CupertinoIcons.plus,
       action: .newFile,
     ),
 
@@ -35,8 +35,9 @@ class DefaultNavigationData {
       icon: CupertinoIcons.refresh,
       action: .refresh,
     ),
+
     NavigationAction(
-      id: 4,
+      id: 5,
       name: "Collapse Folders in Explorer",
       icon: CupertinoIcons.minus_rectangle,
       action: .collapseAll,

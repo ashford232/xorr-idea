@@ -5,7 +5,6 @@ import 'package:xorr/shared/theme/app_fonts.dart';
 Widget appTextField({
   required TextEditingController controller,
   required String hintText,
-  required VoidCallback onPressed,
   bool? isLoading,
   Iterable<String>? autofillHints,
   List<TextInputFormatter>? inputFormatters,
