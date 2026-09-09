@@ -35,6 +35,12 @@ class DefaultNavigationData {
       icon: CupertinoIcons.refresh,
       action: .refresh,
     ),
+    NavigationAction(
+      id: 4,
+      name: "Collapse Folders in Explorer",
+      icon: CupertinoIcons.minus_rectangle,
+      action: .collapseAll,
+    ),
   ];
   static List<NavigationItem> get getDefaultItems => _defaultItems;
   static final List<NavigationItem> _defaultItems = [
@@ -113,20 +119,19 @@ class DefaultNavigationData {
     page: LocalWorkspaceView(),
   );
 
-
-    static final NavigationItem gettingStated = NavigationItem(
+  static final NavigationItem gettingStated = NavigationItem(
     id: 10,
     type: .system,
     name: 'Getting Started',
     icon: CupertinoIcons.lightbulb,
-    page:DefaultView(),
+    page: DefaultView(),
   );
-    static final NavigationItem account = NavigationItem(
+  static final NavigationItem account = NavigationItem(
     id: 11,
     type: .system,
     name: 'User Account',
     icon: CupertinoIcons.person,
 
-    page:UserAccount(),
+    page: UserAccount(),
   );
 }

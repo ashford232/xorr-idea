@@ -146,7 +146,9 @@ class Shortcut extends StatelessWidget {
               ),
               const SizedBox(width: 20),
 
-              Text(description),
+              Flexible(
+                child: Text(description, overflow: .ellipsis, maxLines: 1),
+              ),
             ],
           ),
         ),

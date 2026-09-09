@@ -22,9 +22,13 @@ class BottomContent extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: .spaceBetween,
         children: [
-          Text(
-            '${AppConsts.appName} ${AppConsts.appVersionName} ~ ${navigationState.currentItem?.name ?? "Getting Started"}',
-            style: theme.textTheme.labelMedium?.copyWith(),
+          Flexible(
+            child: Text(
+              maxLines: 1,
+              overflow: .ellipsis,
+              '${AppConsts.appName} ${AppConsts.appVersionName} ~ ${navigationState.currentItem?.name ?? "Getting Started"}',
+              style: theme.textTheme.labelMedium?.copyWith(),
+            ),
           ),
 
           userAsync.when(

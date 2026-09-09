@@ -8,13 +8,13 @@ abstract class StartupConfig {
     const windowOptions = WindowOptions(
       title: "Xorr IDEA",
       backgroundColor: Colors.transparent,
-      minimumSize: Size(900, 800),
+      minimumSize: Size(500, 400),
 
       center: true,
       titleBarStyle: TitleBarStyle.normal,
     );
     await windowManager.waitUntilReadyToShow(windowOptions, () async {
-      await windowManager.setMinimumSize(const Size(900, 800));
+      await windowManager.setMinimumSize(const Size(500, 400));
       await windowManager.show();
       await windowManager.focus();
     });

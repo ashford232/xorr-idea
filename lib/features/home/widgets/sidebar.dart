@@ -22,8 +22,6 @@ class Sidebar extends ConsumerWidget {
     final bool toggled = navigationState.toggled;
     final userSync = ref.watch(getUserProvider);
 
-    final defaultActions = navigationState.defaultActions;
-
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeInOutCubic,
@@ -34,6 +32,7 @@ class Sidebar extends ConsumerWidget {
         crossAxisAlignment: .start,
         children: [
           Column(
+            crossAxisAlignment: .start,
             children: [
               if (!toggled)
                 Padding(
@@ -41,54 +40,11 @@ class Sidebar extends ConsumerWidget {
                     vertical: 5,
                     horizontal: 10,
                   ),
-                  child: Row(
-                    mainAxisAlignment: .end,
-                    children: [
-                      Expanded(
-                        child: Text(
-                          AppConsts.appName,
-                          style: theme.textTheme.labelLarge?.copyWith(
-                            fontWeight: .bold,
-                          ),
-                        ),
-                      ),
-                      Expanded(
-                        child: SizedBox(
-                          height: 30,
-                          child: ListView.separated(
-                            separatorBuilder: (context, index) =>
-                                const SizedBox(width: 5),
-                            scrollDirection: .horizontal,
-                            itemBuilder: (context, index) {
-                              final action = defaultActions[index];
-
-                              return Tooltip(
-                                message: action.name,
-                                child: Material(
-                                  color: Colors.transparent,
-                                  child: InkWell(
-                                    borderRadius: .circular(5),
-                                    onTap: () {},
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 5,
-                                      ),
-                                      child: Icon(
-                                        action.icon,
-                                        size: 20,
-                                        color:
-                                            theme.colorScheme.onSurfaceVariant,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                            itemCount: defaultActions.length,
-                          ),
-                        ),
-                      ),
-                    ],
+                  child: Text(
+                    AppConsts.appName,
+                    style: theme.textTheme.labelLarge?.copyWith(
+                      fontWeight: .bold,
+                    ),
                   ),
                 ),
 
@@ -205,7 +161,7 @@ class Sidebar extends ConsumerWidget {
           Align(
             alignment: toggled ? Alignment.center : Alignment.centerRight,
             child: IconButton(
-              tooltip: toggled ? 'Expand Sidebar' : 'Collapse Sidebar',
+              tooltip: toggled ? 'Expand' : 'Collapse',
               onPressed: () {
                 ref.read(navigationStateProvider.notifier).toggle();
               },

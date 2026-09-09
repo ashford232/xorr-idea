@@ -4,7 +4,9 @@ import 'package:xorr/features/home/data/navigation/default_navigation_data.dart'
 import 'package:xorr/features/home/models/tab_model.dart';
 import 'package:xorr/features/home/providers/navigation_provider.dart';
 import 'package:xorr/features/home/view/system_default_view.dart';
+import 'package:xorr/features/workspace/provider/workspace_provider.dart';
 import 'package:xorr/shared/extensions/cached_image.dart';
+import 'package:xorr/shared/ui/loaders.dart';
 
 class MainContent extends ConsumerStatefulWidget {
   const new({super.key});
@@ -19,12 +21,15 @@ class _MainContentState extends ConsumerState<MainContent> {
   @override
   Widget build(BuildContext context) {
     final navigationState = ref.watch(navigationStateProvider);
+    final navigationStateNotifier = ref.watch(navigationStateProvider.notifier);
 
     final openedTabsSet = navigationState.openedTabs;
 
     final currentTab = navigationState.currentTab;
     final theme = Theme.of(context);
     final openedTabs = openedTabsSet.toList().reversed.toList();
+
+    final workspaceState = ref.watch(workspaceProvider);
     ref.listen(
       navigationStateProvider.select((state) => state.currentTab?.id),
       (previous, next) {
@@ -44,39 +49,59 @@ class _MainContentState extends ConsumerState<MainContent> {
         });
       },
     );
-    return Column(
-      children: [
-        // tabs
+    return workspaceState.when(
+      data: (ws) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (ws == null && navigationState.currentTab == null) {
+            navigationStateNotifier.addTab(TabModel.currentTab);
+          } else if (ws != null && navigationState.currentTab == null) {
+            navigationStateNotifier.chnageNav(
+              DefaultNavigationData.localWorkspace,
+            );
+          }
+        });
 
-        if (openedTabs.isNotEmpty)
-          SizedBox(
-            height: 45,
-            child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: ListView.separated(
-                separatorBuilder: (context, index) => const SizedBox(width: 5),
-                scrollDirection: .horizontal,
-                itemBuilder: (context, index) {
-                  final tab = openedTabs[index];
-                  final key = tabKeys.putIfAbsent(tab.id, () => GlobalKey());
+        return Column(
+          children: [
+            // tabs
 
-                  final bool isCurrent = tab.id == currentTab?.id;
-                  return KeyedSubtree(
-                    key: key,
-                    child: tabCard(isCurrent, theme, ref, tab),
-                  );
-                },
-                itemCount: openedTabs.length,
+            if (openedTabs.isNotEmpty)
+              SizedBox(
+                height: 45,
+                child: Padding(
+                  padding: const EdgeInsets.all(5.0),
+                  child: ListView.separated(
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(width: 5),
+                    scrollDirection: .horizontal,
+                    itemBuilder: (context, index) {
+                      final tab = openedTabs[index];
+                      final key = tabKeys.putIfAbsent(
+                        tab.id,
+                        () => GlobalKey(),
+                      );
+
+                      final bool isCurrent = tab.id == currentTab?.id;
+                      return KeyedSubtree(
+                        key: key,
+                        child: tabCard(isCurrent, theme, ref, tab),
+                      );
+                    },
+                    itemCount: openedTabs.length,
+                  ),
+                ),
               ),
-            ),
-          ),
-        Divider(height: 1),
+            Divider(height: 1),
 
-        //tabs view
-        if (openedTabs.isNotEmpty) Expanded(child: currentTab!.item),
+            //tabs view
+            if (openedTabs.isNotEmpty) Expanded(child: currentTab!.item),
 
-        if (openedTabs.isEmpty) Expanded(child: SystemDefaultView()),
-      ],
+            if (openedTabs.isEmpty) Expanded(child: SystemDefaultView()),
+          ],
+        );
+      },
+      error: (err, st) => Center(child: Text(err.toString())),
+      loading: () => Center(child: appLoader()),
     );
   }
 

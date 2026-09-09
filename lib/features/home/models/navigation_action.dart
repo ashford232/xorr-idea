@@ -37,5 +37,6 @@ class NavigationAction {
 enum NavAction{
   newFile,
   newFolder,
-  refresh
+  refresh,
+  collapseAll
 }

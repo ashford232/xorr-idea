@@ -1,14 +1,24 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:xorr/features/home/data/navigation/default_navigation_data.dart';
+import 'package:xorr/features/home/providers/navigation_provider.dart';
 import 'package:xorr/features/home/view/default_view.dart';
-import 'package:xorr/shared/theme/app_fonts.dart';
+import 'package:xorr/features/workspace/provider/workspace_provider.dart';
+import 'package:xorr/shared/ui/loaders.dart';
 
-class SystemDefaultView extends StatelessWidget {
+class SystemDefaultView extends ConsumerWidget {
   const SystemDefaultView({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
+
+    final workspacesAsync = ref.watch(getAllWorkspaceProvider);
+
+    final dbController = ref.watch(workspaceControllerProvider);
+
+    final navigationStateNotifier = ref.read(navigationStateProvider.notifier);
 
     return Scaffold(
       body: Center(
@@ -19,30 +29,84 @@ class SystemDefaultView extends StatelessWidget {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                SizedBox(
-                  width: 64,
-                  height: 64,
+                Container(
+                  decoration: BoxDecoration(
+                    color: theme.colorScheme.primaryContainer,
+
+                    borderRadius: .circular(12),
+                  ),
+                  width: 100,
+                  height: 100,
                   child: Icon(
-                    CupertinoIcons.lightbulb,
-                    size: 64,
+                    CupertinoIcons.lightbulb_fill,
+                    size: 54,
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
 
                 const SizedBox(height: 12),
 
-                Text(
-                  'Xorr IDEA',
-                  style: theme.textTheme.headlineMedium?.copyWith(
-                    fontFamily: AppFonts.inter,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-
-                const SizedBox(height: 28),
                 const SizedBox(height: 32),
+                workspacesAsync.when(
+                  data: (ws) {
+                    if (ws.isEmpty) {
+                      return SizedBox.shrink();
+                    }
+                    return Column(
+                      crossAxisAlignment: .start,
+                      children: [
+                        Text('Recent Workspaces'),
+                        const SizedBox(height: 5),
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: NeverScrollableScrollPhysics(),
+                          itemCount: ws.length,
+                          itemBuilder: (context, index) {
+                            final workspace = ws[index];
 
-                const SizedBox(height: 12),
+                            return Row(
+                              mainAxisAlignment: .spaceBetween,
+                              children: [
+                                Text(
+                                  workspace.name,
+                                  style: theme.textTheme.labelLarge?.copyWith(),
+                                ),
+                                MouseRegion(
+                                  cursor: SystemMouseCursors.click,
+                                  child: GestureDetector(
+                                    onTap: () async {
+                                      await dbController.openWorkspace(
+                                        wsPath: workspace.path,
+                                      );
+                                      ref.invalidate(getAllWorkspaceProvider);
+                                      ref.invalidate(workspaceProvider);
+                                      navigationStateNotifier.chnageNav(
+                                        DefaultNavigationData.localWorkspace,
+                                      );
+                                    },
+                                    child: Text(
+                                      workspace.path,
+                                      style: theme.textTheme.labelLarge
+                                          ?.copyWith(
+                                            color: theme.colorScheme.secondary,
+                                            decoration: .underline,
+                                            fontWeight: .w300,
+                                          ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                      ],
+                    );
+                  },
+                  error: (err, st) => Center(child: Text(err.toString())),
+                  loading: () => Center(child: appLoader()),
+                ),
+                const SizedBox(height: 30),
+                Text('Shortcuts'),
 
                 Align(
                   alignment: .bottomCenter,
