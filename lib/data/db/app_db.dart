@@ -1,9 +1,7 @@
-import 'dart:io';
-
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
-import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
+import 'package:xorr/features/workspace/models/app_directories.dart';
 
 part 'app_db.g.dart';
 
@@ -44,11 +42,9 @@ class AppDb extends _$AppDb {
 
 LazyDatabase _openConnection() {
   return LazyDatabase(() async {
-    final directory = await getApplicationDocumentsDirectory();
-
-    final dbFile = File(
-      path.join(directory.path, 'Xorr', 'app.db'),
-    );
+    final docDirectory = await getApplicationDocumentsDirectory();
+    final dbFile = AppDirectories(documentsDirectory: docDirectory)
+        .databaseFile;
 
     return NativeDatabase.createInBackground(dbFile);
   });

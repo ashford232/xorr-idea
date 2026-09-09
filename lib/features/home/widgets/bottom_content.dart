@@ -4,17 +4,18 @@ import 'package:xorr/features/auth/models/user_model.dart';
 import 'package:xorr/features/auth/provider/auth_provider.dart';
 import 'package:xorr/features/home/data/navigation/default_navigation_data.dart';
 import 'package:xorr/features/home/providers/navigation_provider.dart';
-import 'package:xorr/shared/consts/app_consts.dart';
+import 'package:xorr/features/workspace/provider/workspace_provider.dart';
 import 'package:xorr/shared/extensions/cached_image.dart';
 import 'package:xorr/shared/ui/loaders.dart';
+import 'package:path/path.dart' as p;
 
 class BottomContent extends ConsumerWidget {
   const BottomContent({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final navigationState = ref.watch(navigationStateProvider);
     final navigationStateNotifier = ref.watch(navigationStateProvider.notifier);
+    final workspaceState = ref.watch(workspaceProvider).value;
     final userAsync = ref.watch(getUserProvider);
     final theme = Theme.of(context);
     return Padding(
@@ -22,14 +23,19 @@ class BottomContent extends ConsumerWidget {
       child: Row(
         mainAxisAlignment: .spaceBetween,
         children: [
-          Flexible(
-            child: Text(
-              maxLines: 1,
-              overflow: .ellipsis,
-              '${AppConsts.appName} ${AppConsts.appVersionName} ~ ${navigationState.currentItem?.name ?? "Getting Started"}',
-              style: theme.textTheme.labelMedium?.copyWith(),
+          if (workspaceState != null)
+            Flexible(
+              child: Text(
+                workspaceState.selectedEntity == null ||
+                        workspaceState.selectedEntity ==
+                            workspaceState.workspace.path
+                    ? workspaceState.workspace.name
+                    : "${workspaceState.workspace.name}/${p.relative(workspaceState.selectedEntity!, from: workspaceState.workspace.path)}",
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.bodyMedium,
+              ),
             ),
-          ),
 
           userAsync.when(
             data: (user) {

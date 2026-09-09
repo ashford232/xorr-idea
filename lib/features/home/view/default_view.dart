@@ -15,74 +15,78 @@ class DefaultView extends StatelessWidget {
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(32),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'A simple workspace for your ideas, notes, projects, and files',
-              style: theme.textTheme.displaySmall?.copyWith(
-                fontFamily: AppFonts.inter,
+        child: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'A simple workspace for your ideas, notes, projects, and files',
+                style: theme.textTheme.displaySmall?.copyWith(
+                  fontFamily: AppFonts.inter,
+                ),
               ),
-            ),
 
-            const SizedBox(height: 15),
+              const SizedBox(height: 15),
 
-            Text(
-              'Your workspace for notes, ideas, and files.',
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: onSurface(0.8),
+              Text(
+                'Your workspace for notes, ideas, and files.',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: onSurface(0.8),
+                ),
               ),
-            ),
 
-            const SizedBox(height: 22),
+              const SizedBox(height: 22),
 
-            Text(
-              'Get started',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+              Text(
+                'Get started',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
-            ),
 
-            const SizedBox(height: 12),
+              const SizedBox(height: 12),
 
-            Text(
-              'Write down your ideas and thoughts\n'
-              'Organize everything in your workspace\n'
-              'Add files and keep everything together',
-              style: theme.textTheme.bodyLarge?.copyWith(color: onSurface(0.8)),
-            ),
-            const SizedBox(height: 32),
-
-            Text(
-              'Quick shortcuts',
-              style: theme.textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.bold,
+              Text(
+                'Write down your ideas and thoughts\n'
+                'Organize everything in your workspace\n'
+                'Add files and keep everything together',
+                style: theme.textTheme.bodyLarge?.copyWith(
+                  color: onSurface(0.8),
+                ),
               ),
-            ),
+              const SizedBox(height: 32),
 
-            const SizedBox(height: 12),
+              Text(
+                'Quick shortcuts',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
 
-            const Shortcut(keys: ['Ctrl', 'N'], description: 'New idea'),
-            const Shortcut(keys: ['Ctrl', 'O'], description: 'Open file'),
-            const Shortcut(keys: ["Ctrl", " F"], description: 'Find ideas'),
-            const Shortcut(keys: ['Ctrl', 'S'], description: 'Save'),
-            const Shortcut(
-              keys: ["Ctrl", "Alt", " S"],
-              description: 'Open Settings',
-            ),
-            const Shortcut(
-              keys: ["Ctrl", "Alt", " T"],
-              description: 'Open Trash',
-            ),
-            const Shortcut(
-              keys: ['Ctrl', 'Alt', 'F'],
-              description: 'Open Starred',
-            ),
-            const Shortcut(
-              keys: ['Ctrl', 'Alt', 'A'],
-              description: 'Open Archive',
-            ),
-          ],
+              const SizedBox(height: 12),
+
+              const Shortcut(keys: ['Ctrl', 'N'], description: 'New idea'),
+              const Shortcut(keys: ['Ctrl', 'O'], description: 'Open file'),
+              const Shortcut(keys: ["Ctrl", " F"], description: 'Find ideas'),
+              const Shortcut(keys: ['Ctrl', 'S'], description: 'Save'),
+              const Shortcut(
+                keys: ["Ctrl", "Alt", " S"],
+                description: 'Open Settings',
+              ),
+              const Shortcut(
+                keys: ["Ctrl", "Alt", " T"],
+                description: 'Open Trash',
+              ),
+              const Shortcut(
+                keys: ['Ctrl', 'Alt', 'F'],
+                description: 'Open Starred',
+              ),
+              const Shortcut(
+                keys: ['Ctrl', 'Alt', 'A'],
+                description: 'Open Archive',
+              ),
+            ],
+          ),
         ),
       ),
     );

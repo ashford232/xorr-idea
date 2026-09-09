@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path/path.dart' as p;
-import 'package:xorr/data/db/app_db.dart';
 import 'package:xorr/features/home/models/navigation_action.dart';
 import 'package:xorr/features/home/models/navigation_state.dart';
 import 'package:xorr/features/home/providers/navigation_provider.dart';
@@ -29,12 +28,28 @@ class _WorkspaceExplorerState extends ConsumerState<WorkspaceExplorer> {
   List<NavigationAction> get defaultActions => navigationState.defaultActions;
   AsyncValue<WorkspaceState?> get workspaceStateAsync =>
       ref.watch(workspaceProvider);
+  WorkspaceNotifier get workspaceNotifier =>
+      ref.watch(workspaceProvider.notifier);
 
   final Set<String> expandedFolders = {};
   final Map<String, List<FileSystemEntity>> folderChildren = {};
 
-  String? selectedEntity;
-  String? selectedFolder;
+  /// Resolves target directory based on currently selected entity
+  String _getTargetFolder(WorkspaceState ws) {
+    final selectedPath = ws.selectedEntity;
+    if (selectedPath == null || selectedPath.isEmpty) {
+      return ws.workspace.path;
+    }
+
+    final type = FileSystemEntity.typeSync(selectedPath);
+    if (type == FileSystemEntityType.file) {
+      return p.dirname(selectedPath);
+    } else if (type == FileSystemEntityType.directory) {
+      return selectedPath;
+    }
+
+    return ws.workspace.path;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -72,17 +87,20 @@ class _WorkspaceExplorerState extends ConsumerState<WorkspaceExplorer> {
                     );
                   }
 
-                  final workspace = workspaceState.workspace;
                   final entities = workspaceState.entities;
 
                   return Column(
                     children: [
-                      explorerTop(workspace, theme),
+                      explorerTop(workspaceState, theme),
                       Expanded(
                         child: ListView.builder(
                           itemCount: entities.length,
                           itemBuilder: (context, index) {
-                            return _buildEntityNode(entities[index], 0);
+                            return _buildEntityNode(
+                              entities[index],
+                              0,
+                              workspaceState,
+                            );
                           },
                         ),
                       ),
@@ -99,7 +117,11 @@ class _WorkspaceExplorerState extends ConsumerState<WorkspaceExplorer> {
     );
   }
 
-  Widget _buildEntityNode(FileSystemEntity entity, int depth) {
+  Widget _buildEntityNode(
+    FileSystemEntity entity,
+    int depth,
+    WorkspaceState ws,
+  ) {
     final entityPath = entity.path;
     final isFolder =
         FileSystemEntity.typeSync(entityPath) != FileSystemEntityType.file;
@@ -109,24 +131,30 @@ class _WorkspaceExplorerState extends ConsumerState<WorkspaceExplorer> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        EntityCard(
-          isFile: !isFolder,
-          isExpanded: isExpanded,
-          entityPath: entityPath,
-          isActive: selectedEntity == entityPath,
-          depth: depth,
-          onTap: () {
-            selectedEntity = entityPath;
-
-            if (isFolder) {
-              selectedFolder = entityPath;
-              toggleFolder(entityPath);
-            } else {
-              setState(() {});
-            }
-          },
+        GestureDetector(
+          onSecondaryTapDown: (details) =>
+              _showContextMenu(context, details.globalPosition, entity),
+          child: Row(
+            children: [
+              Expanded(
+                child: EntityCard(
+                  isFile: !isFolder,
+                  isExpanded: isExpanded,
+                  entityPath: entityPath,
+                  isActive: ws.selectedEntity == entityPath,
+                  depth: depth,
+                  onTap: () async {
+                    if (isFolder) {
+                      await _handleFolderTap(entityPath);
+                    } else {
+                      _changePath(entityPath);
+                    }
+                  },
+                ),
+              ),
+            ],
+          ),
         ),
-
         AnimatedSize(
           duration: const Duration(milliseconds: 250),
           curve: Curves.easeInOut,
@@ -134,7 +162,7 @@ class _WorkspaceExplorerState extends ConsumerState<WorkspaceExplorer> {
           child: isExpanded
               ? Column(
                   children: children
-                      .map((child) => _buildEntityNode(child, depth + 1))
+                      .map((child) => _buildEntityNode(child, depth + 1, ws))
                       .toList(),
                 )
               : const SizedBox(width: double.infinity, height: 0),
@@ -143,40 +171,259 @@ class _WorkspaceExplorerState extends ConsumerState<WorkspaceExplorer> {
     );
   }
 
-  Future<void> toggleFolder(String folderPath) async {
-    if (expandedFolders.contains(folderPath)) {
+  void _showContextMenu(
+    BuildContext context,
+    Offset position,
+    FileSystemEntity entity,
+  ) {
+    showMenu(
+      menuPadding: .zero,
+      context: context,
+      position: RelativeRect.fromLTRB(
+        position.dx,
+        position.dy,
+        position.dx,
+        position.dy,
+      ),
+      items: <PopupMenuEntry>[
+        const PopupMenuItem(height: 22, value: 'open', child: Text('Open')),
+        const PopupMenuItem(height: 22, value: 'rename', child: Text('Rename')),
+        const PopupMenuItem(
+          height: 22,
+
+          value: 'delete',
+          child: Text('Delete', style: TextStyle(color: Colors.red)),
+        ),
+        const PopupMenuItem(
+          height: 22,
+          value: 'properties',
+          child: Text('Properties'),
+        ),
+      ],
+    ).then((action) {
+      if (action != null) _handleEntityAction(action, entity);
+    });
+  }
+
+  Future<void> _handleEntityAction(
+    String action,
+    FileSystemEntity entity,
+  ) async {
+    switch (action) {
+      case 'open':
+        _openEntity(entity);
+        break;
+      case 'rename':
+        await _renameEntity(entity);
+        break;
+      case 'delete':
+        await _deleteEntity(entity);
+        break;
+      case 'properties':
+        await _showProperties(entity);
+        break;
+    }
+  }
+
+  void _openEntity(FileSystemEntity entity) {
+    final isFolder =
+        FileSystemEntity.typeSync(entity.path) ==
+        FileSystemEntityType.directory;
+    if (isFolder) {
+      _handleFolderTap(entity.path);
+    } else {
+      _changePath(entity.path);
+    }
+  }
+
+  Future<void> _renameEntity(FileSystemEntity entity) async {
+    final oldName = p.basename(entity.path);
+    final newName = await showNameDialog(
+      context: context,
+      title: 'Rename "$oldName"',
+      hintText: 'New name',
+      initialValue: oldName,
+    );
+
+    if (newName != null && newName.isNotEmpty && newName != oldName) {
+      final parentDir = p.dirname(entity.path);
+      final newPath = p.join(parentDir, newName);
+
+      try {
+        await entity.rename(newPath);
+
+        if (expandedFolders.contains(entity.path)) {
+          expandedFolders.remove(entity.path);
+          expandedFolders.add(newPath);
+        }
+
+        await _refreshFolder(parentDir);
+        refresh();
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Failed to rename: $e')));
+      }
+    }
+  }
+
+  Future<void> _deleteEntity(FileSystemEntity entity) async {
+    final entityName = p.basename(entity.path);
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirm Delete'),
+        content: Text('Are you sure you want to delete "$entityName"?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            style: FilledButton.styleFrom(backgroundColor: Colors.red),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      try {
+        await entity.delete(recursive: true);
+        final parentDir = p.dirname(entity.path);
+
+        expandedFolders.remove(entity.path);
+        folderChildren.remove(entity.path);
+
+        await _refreshFolder(parentDir);
+        refresh();
+      } catch (e) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('Failed to delete: $e')));
+      }
+    }
+  }
+
+  Future<void> _showProperties(FileSystemEntity entity) async {
+    final stat = await entity.stat();
+    final isFolder = stat.type == FileSystemEntityType.directory;
+
+    if (!mounted) return;
+
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('${isFolder ? "Folder" : "File"} Properties'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Name: ${p.basename(entity.path)}',
+              style: const TextStyle(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 8),
+            Text('Path: ${entity.path}'),
+            const SizedBox(height: 8),
+            Text('Size: ${(stat.size / 1024).toStringAsFixed(2)} KB'),
+            const SizedBox(height: 8),
+            Text('Modified: ${stat.modified.toLocal()}'),
+            const SizedBox(height: 8),
+            Text('Mode: ${stat.modeString()}'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Close'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _handleFolderTap(String path) async {
+    changeFolder(path);
+
+    if (expandedFolders.contains(path)) {
       setState(() {
-        expandedFolders.remove(folderPath);
+        expandedFolders.remove(path);
       });
       return;
     }
 
-    final directory = Directory(folderPath);
+    await _expandFolder(path);
+  }
+
+  Future<void> _expandFolder(String path) async {
+    final directory = Directory(path);
+
     if (!await directory.exists()) return;
 
     final children = await directory.list().toList();
 
     children.sort((a, b) {
-      final aIsFolder =
-          FileSystemEntity.typeSync(a.path) != FileSystemEntityType.file;
-      final bIsFolder =
-          FileSystemEntity.typeSync(b.path) != FileSystemEntityType.file;
+      final aIsFolder = a is Directory;
+      final bIsFolder = b is Directory;
 
       if (aIsFolder && !bIsFolder) return -1;
       if (!aIsFolder && bIsFolder) return 1;
 
-      final aName = p.basename(a.path).toLowerCase();
-      final bName = p.basename(b.path).toLowerCase();
-      return aName.compareTo(bName);
+      return p
+          .basename(a.path)
+          .toLowerCase()
+          .compareTo(p.basename(b.path).toLowerCase());
     });
 
+    if (!mounted) return;
+
     setState(() {
-      expandedFolders.add(folderPath);
-      folderChildren[folderPath] = children;
+      expandedFolders.add(path);
+      folderChildren[path] = children;
     });
   }
 
-  Row explorerTop(Workspace workspace, ThemeData theme) {
+  void _changePath(String path) {
+    workspaceNotifier.changePath(path);
+  }
+
+  void changeFolder(String path) {
+    workspaceNotifier.changeFolder(path);
+  }
+
+  Future<void> _refreshFolder(String path) async {
+    final directory = Directory(path);
+
+    if (!await directory.exists()) return;
+
+    final children = await directory.list().toList();
+
+    children.sort((a, b) {
+      final aIsFolder = a is Directory;
+      final bIsFolder = b is Directory;
+
+      if (aIsFolder && !bIsFolder) return -1;
+      if (!aIsFolder && bIsFolder) return 1;
+
+      return p
+          .basename(a.path)
+          .toLowerCase()
+          .compareTo(p.basename(b.path).toLowerCase());
+    });
+
+    if (!mounted) return;
+
+    setState(() {
+      folderChildren[path] = children;
+      expandedFolders.add(path);
+    });
+  }
+
+  Row explorerTop(WorkspaceState ws, ThemeData theme) {
+    final workspace = ws.workspace;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -201,61 +448,53 @@ class _WorkspaceExplorerState extends ConsumerState<WorkspaceExplorer> {
                 final action = defaultActions[index];
                 if (expandedFolders.isEmpty &&
                     action.action == NavAction.collapseAll) {
-                  return SizedBox.shrink();
+                  return const SizedBox.shrink();
                 }
                 return ActionBtn(
                   name: action.name,
                   icon: action.icon,
                   onPressed: () async {
-                    final parentFolder = selectedFolder ?? workspace.path;
+                    final targetFolder = _getTargetFolder(ws);
+                    final relative = p.relative(
+                      targetFolder,
+                      from: workspace.path,
+                    );
 
                     switch (action.action) {
                       case NavAction.newFile:
                         final fileName = await showNameDialog(
                           context: context,
-                          title: 'New File\n$parentFolder:',
+                          title: 'New File\n$relative/',
                           hintText: 'File name',
                         );
-                        if (fileName != null) {
-                          final filePath = "$parentFolder/$fileName";
+                        if (fileName != null && fileName.isNotEmpty) {
+                          final filePath = p.join(targetFolder, fileName);
                           await controller.createFile(filePath);
-                          selectedEntity = filePath;
+                          workspaceNotifier.setFolder(targetFolder);
+                          await _refreshFolder(targetFolder);
 
-                          if (expandedFolders.contains(parentFolder)) {
-                            expandedFolders.remove(parentFolder);
-                          }
-                          await toggleFolder(parentFolder);
-
-                          setState(() {});
-
+                          _changePath(filePath);
                           refresh();
                         }
 
                       case NavAction.newFolder:
                         final folderName = await showNameDialog(
                           context: context,
-                          title: 'New Folder\n$parentFolder:',
+                          title: 'New Folder\n$targetFolder:',
                           hintText: 'Folder name',
                         );
-                        if (folderName != null) {
-                          final folderPath = "$parentFolder/$folderName";
+                        if (folderName != null && folderName.isNotEmpty) {
+                          final folderPath = p.join(targetFolder, folderName);
                           await controller.createFolder(folderPath);
-                          selectedEntity = folderPath;
-                          selectedFolder = folderPath;
-                          if (expandedFolders.contains(parentFolder)) {
-                            expandedFolders.remove(parentFolder);
-                          }
-                          await toggleFolder(parentFolder);
-                          setState(() {});
+                          await _refreshFolder(targetFolder);
 
+                          _handleFolderTap(folderPath);
                           refresh();
                         }
 
                       case NavAction.collapseAll:
                         expandedFolders.clear();
-                        selectedEntity = null;
-                        selectedFolder == null;
-                        setState(() {});
+                        workspaceNotifier.changePath(workspace.path);
 
                       case NavAction.refresh:
                         refresh();
@@ -286,8 +525,9 @@ Future<String?> showNameDialog({
   required BuildContext context,
   required String title,
   required String hintText,
+  String initialValue = '',
 }) async {
-  final controller = TextEditingController();
+  final controller = TextEditingController(text: initialValue);
 
   final result = await showDialog<String>(
     context: context,
@@ -326,12 +566,11 @@ Future<String?> showNameDialog({
                       borderRadius: BorderRadius.circular(6),
                     ),
                   ),
-
                   onSubmitted: (_) {
-                    // final name = controller.text.trim();
-                    // if (name.isNotEmpty) {
-                    //   Navigator.pop(context, name);
-                    // }
+                    final name = controller.text.trim();
+                    if (name.isNotEmpty) {
+                      Navigator.pop(context, name);
+                    }
                   },
                 ),
                 const SizedBox(height: 20),
@@ -368,7 +607,7 @@ Future<String?> showNameDialog({
                           }
                         },
                         child: const Text(
-                          'Create',
+                          'Save',
                           style: TextStyle(fontSize: 13),
                         ),
                       ),
