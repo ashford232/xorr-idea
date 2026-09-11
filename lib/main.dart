@@ -1,3 +1,4 @@
+import 'package:appflowy_editor/appflowy_editor.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xorr/config/startup_config.dart';
@@ -24,8 +25,9 @@ class Xorr extends ConsumerWidget {
       home: const AuthWrapper(),
       theme: AppThemes.lightTheme,
       darkTheme: AppThemes.darkTheme,
-      themeMode: .system,
+      themeMode: .light,
       title: "Xorr IDEA",
+      localizationsDelegates: const [AppFlowyEditorLocalizations.delegate],
     );
   }
 }

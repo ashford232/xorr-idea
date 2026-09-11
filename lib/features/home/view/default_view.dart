@@ -67,23 +67,16 @@ class DefaultView extends StatelessWidget {
 
               const Shortcut(keys: ['Ctrl', 'N'], description: 'New idea'),
               const Shortcut(keys: ['Ctrl', 'O'], description: 'Open file'),
-              const Shortcut(keys: ["Ctrl", " F"], description: 'Find ideas'),
+              const Shortcut(keys: ["Ctrl", " F"], description: 'Search'),
               const Shortcut(keys: ['Ctrl', 'S'], description: 'Save'),
               const Shortcut(
                 keys: ["Ctrl", "Alt", " S"],
                 description: 'Open Settings',
               ),
-              const Shortcut(
-                keys: ["Ctrl", "Alt", " T"],
-                description: 'Open Trash',
-              ),
+
               const Shortcut(
                 keys: ['Ctrl', 'Alt', 'F'],
                 description: 'Open Starred',
-              ),
-              const Shortcut(
-                keys: ['Ctrl', 'Alt', 'A'],
-                description: 'Open Archive',
               ),
             ],
           ),

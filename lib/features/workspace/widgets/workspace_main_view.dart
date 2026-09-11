@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:xorr/features/home/view/system_default_view.dart';
 import 'package:xorr/features/workspace/notifiers/workspace_notifier.dart';
 import 'package:xorr/features/workspace/provider/workspace_provider.dart';
+import 'package:xorr/features/workspace/views/workspace_view.dart';
 import 'package:xorr/features/workspace/widgets/file_icon.dart';
 import 'package:xorr/shared/ui/loaders.dart';
 import 'package:path/path.dart' as p;
@@ -86,9 +88,15 @@ class _WorkspaceMainViewState extends ConsumerState<WorkspaceMainView> {
               ),
             Divider(height: 1),
 
-            //tabs view
-            if (openedTabs.isNotEmpty)
-              Expanded(child: Center(child: Text(currentTab ?? ""))),
+            if (openedTabs.isNotEmpty && currentTab != null)
+              Expanded(
+                child: WorkspaceView(
+                  key: Key(currentTab),
+                  currentTab: currentTab,
+                ),
+              ),
+
+            if (openedTabs.isEmpty) Expanded(child: SystemDefaultView()),
           ],
         );
       },
@@ -125,7 +133,7 @@ class _WorkspaceMainViewState extends ConsumerState<WorkspaceMainView> {
               ),
               child: Row(
                 children: [
-                  FileSystemIcon(extension: p.extension(tab)),
+                  FileSystemIcon(extension: p.extension(tab), size: 18),
                   const SizedBox(width: 5),
                   Text(
                     p.relative(tab, from: base),

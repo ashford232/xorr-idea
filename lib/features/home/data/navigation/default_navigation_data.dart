@@ -4,14 +4,11 @@ import 'package:xorr/features/home/models/navigation_item.dart';
 import 'package:xorr/features/home/view/default_view.dart';
 import 'package:xorr/features/settings/views/settings_view.dart';
 import 'package:xorr/features/settings/views/user_account.dart';
-import 'package:xorr/features/workspace/views/archive_view.dart';
 import 'package:xorr/features/workspace/views/local_workspace_view.dart';
 import 'package:xorr/features/workspace/views/notifications_view.dart';
 import 'package:xorr/features/workspace/views/favorites_view.dart';
-import 'package:xorr/features/workspace/views/draft_view.dart';
+import 'package:xorr/features/workspace/views/online_workspace_view.dart';
 import 'package:xorr/features/workspace/views/search_view.dart';
-import 'package:xorr/features/workspace/views/trash_view.dart';
-import 'package:xorr/features/workspace/views/workspace_view.dart';
 
 class DefaultNavigationData {
   static List<NavigationAction> get getDefaultActions => _defaultAction;
@@ -53,37 +50,13 @@ class DefaultNavigationData {
       emoji: null,
       page: SearchView(),
     ),
-    NavigationItem(
-      id: 0,
-      type: .system,
-      name: "Draft",
-      icon: CupertinoIcons.doc_text,
-      emoji: null,
-      page: DraftView(),
-    ),
+
     NavigationItem(
       id: 1,
       type: .user,
       name: "Starred",
       icon: CupertinoIcons.star,
       page: StarredView(),
-    ),
-
-    NavigationItem(
-      id: 2,
-      type: .user,
-      name: "Archive",
-      icon: CupertinoIcons.archivebox,
-      page: ArchiveView(),
-    ),
-
-    NavigationItem(
-      id: 3,
-      type: .user,
-      name: "Trash",
-      icon: CupertinoIcons.trash,
-
-      page: TrashView(),
     ),
 
     NavigationItem(
@@ -109,7 +82,7 @@ class DefaultNavigationData {
     type: .user,
     name: 'Workspace',
     icon: CupertinoIcons.square_stack_3d_up,
-    page: WorkspaceView(),
+    page: OnlineWorkspaceView(),
   );
 
   static final NavigationItem localWorkspace = NavigationItem(

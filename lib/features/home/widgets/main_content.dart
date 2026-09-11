@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:xorr/features/auth/provider/auth_provider.dart';
 import 'package:xorr/features/home/data/navigation/default_navigation_data.dart';
 import 'package:xorr/features/home/models/tab_model.dart';
 import 'package:xorr/features/home/providers/navigation_provider.dart';
 import 'package:xorr/features/home/view/system_default_view.dart';
 import 'package:xorr/features/workspace/provider/workspace_provider.dart';
 import 'package:xorr/shared/extensions/cached_image.dart';
-import 'package:xorr/shared/ui/loaders.dart';
 
 class MainContent extends ConsumerStatefulWidget {
   const new({super.key});
@@ -30,6 +30,7 @@ class _MainContentState extends ConsumerState<MainContent> {
     final openedTabs = openedTabsSet.toList().reversed.toList();
 
     final workspaceState = ref.watch(workspaceProvider);
+    final user = ref.watch(getUserProvider).value?.user;
     ref.listen(
       navigationStateProvider.select((state) => state.currentTab?.id),
       (previous, next) {
@@ -56,7 +57,9 @@ class _MainContentState extends ConsumerState<MainContent> {
             navigationStateNotifier.addTab(TabModel.currentTab);
           } else if (ws != null && navigationState.currentTab == null) {
             navigationStateNotifier.chnageNav(
-              DefaultNavigationData.localWorkspace,
+              user == null
+                  ? DefaultNavigationData.localWorkspace
+                  : DefaultNavigationData.workspace,
             );
           }
         });
@@ -101,7 +104,7 @@ class _MainContentState extends ConsumerState<MainContent> {
         );
       },
       error: (err, st) => Center(child: Text(err.toString())),
-      loading: () => Center(child: appLoader()),
+      loading: () => SizedBox.shrink(),
     );
   }
 

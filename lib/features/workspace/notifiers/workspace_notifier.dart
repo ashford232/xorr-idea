@@ -83,6 +83,19 @@ class WorkspaceNotifier extends AsyncNotifier<WorkspaceState?> {
     state = AsyncValue.data(state.value?.copyWith(selectedEntity: path));
     setFolder(path);
   }
+
+  void toggleWorkspaceStatus({bool? status, bool? error}) {
+    state = AsyncValue.data(
+      state.value?.copyWith(
+        workspace: state.value?.workspace.copyWith(
+          saved: status,
+          dirty: status == null ? null : !status,
+          updatedAt: DateTime.now(),
+          error: error,
+        ),
+      ),
+    );
+  }
 }
 
 class WorkspaceState {

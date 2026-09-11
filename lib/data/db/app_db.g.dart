@@ -57,7 +57,7 @@ class $WorkspacesTable extends Workspaces
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'CHECK ("saved" IN (0, 1))',
     ),
-    defaultValue: const Constant(false),
+    defaultValue: const Constant(true),
   );
   static const VerificationMeta _dirtyMeta = const VerificationMeta('dirty');
   @override
@@ -69,6 +69,19 @@ class $WorkspacesTable extends Workspaces
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'CHECK ("dirty" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _errorMeta = const VerificationMeta('error');
+  @override
+  late final GeneratedColumn<bool> error = GeneratedColumn<bool>(
+    'error',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("error" IN (0, 1))',
     ),
     defaultValue: const Constant(false),
   );
@@ -133,6 +146,7 @@ class $WorkspacesTable extends Workspaces
     path,
     saved,
     dirty,
+    error,
     description,
     emoji,
     createdAt,
@@ -190,6 +204,12 @@ class $WorkspacesTable extends Workspaces
       context.handle(
         _dirtyMeta,
         dirty.isAcceptableOrUnknown(data['dirty']!, _dirtyMeta),
+      );
+    }
+    if (data.containsKey('error')) {
+      context.handle(
+        _errorMeta,
+        error.isAcceptableOrUnknown(data['error']!, _errorMeta),
       );
     }
     if (data.containsKey('description')) {
@@ -265,6 +285,10 @@ class $WorkspacesTable extends Workspaces
         DriftSqlType.bool,
         data['${effectivePrefix}dirty'],
       )!,
+      error: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}error'],
+      )!,
       description: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}description'],
@@ -301,6 +325,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
   final String path;
   final bool saved;
   final bool dirty;
+  final bool error;
   final String? description;
   final String? emoji;
   final DateTime createdAt;
@@ -313,6 +338,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
     required this.path,
     required this.saved,
     required this.dirty,
+    required this.error,
     this.description,
     this.emoji,
     required this.createdAt,
@@ -328,6 +354,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
     map['path'] = Variable<String>(path);
     map['saved'] = Variable<bool>(saved);
     map['dirty'] = Variable<bool>(dirty);
+    map['error'] = Variable<bool>(error);
     if (!nullToAbsent || description != null) {
       map['description'] = Variable<String>(description);
     }
@@ -350,6 +377,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
       path: Value(path),
       saved: Value(saved),
       dirty: Value(dirty),
+      error: Value(error),
       description: description == null && nullToAbsent
           ? const Value.absent()
           : Value(description),
@@ -376,6 +404,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
       path: serializer.fromJson<String>(json['path']),
       saved: serializer.fromJson<bool>(json['saved']),
       dirty: serializer.fromJson<bool>(json['dirty']),
+      error: serializer.fromJson<bool>(json['error']),
       description: serializer.fromJson<String?>(json['description']),
       emoji: serializer.fromJson<String?>(json['emoji']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -393,6 +422,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
       'path': serializer.toJson<String>(path),
       'saved': serializer.toJson<bool>(saved),
       'dirty': serializer.toJson<bool>(dirty),
+      'error': serializer.toJson<bool>(error),
       'description': serializer.toJson<String?>(description),
       'emoji': serializer.toJson<String?>(emoji),
       'createdAt': serializer.toJson<DateTime>(createdAt),
@@ -408,6 +438,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
     String? path,
     bool? saved,
     bool? dirty,
+    bool? error,
     Value<String?> description = const Value.absent(),
     Value<String?> emoji = const Value.absent(),
     DateTime? createdAt,
@@ -420,6 +451,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
     path: path ?? this.path,
     saved: saved ?? this.saved,
     dirty: dirty ?? this.dirty,
+    error: error ?? this.error,
     description: description.present ? description.value : this.description,
     emoji: emoji.present ? emoji.value : this.emoji,
     createdAt: createdAt ?? this.createdAt,
@@ -434,6 +466,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
       path: data.path.present ? data.path.value : this.path,
       saved: data.saved.present ? data.saved.value : this.saved,
       dirty: data.dirty.present ? data.dirty.value : this.dirty,
+      error: data.error.present ? data.error.value : this.error,
       description: data.description.present
           ? data.description.value
           : this.description,
@@ -455,6 +488,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
           ..write('path: $path, ')
           ..write('saved: $saved, ')
           ..write('dirty: $dirty, ')
+          ..write('error: $error, ')
           ..write('description: $description, ')
           ..write('emoji: $emoji, ')
           ..write('createdAt: $createdAt, ')
@@ -472,6 +506,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
     path,
     saved,
     dirty,
+    error,
     description,
     emoji,
     createdAt,
@@ -488,6 +523,7 @@ class Workspace extends DataClass implements Insertable<Workspace> {
           other.path == this.path &&
           other.saved == this.saved &&
           other.dirty == this.dirty &&
+          other.error == this.error &&
           other.description == this.description &&
           other.emoji == this.emoji &&
           other.createdAt == this.createdAt &&
@@ -502,6 +538,7 @@ class WorkspacesCompanion extends UpdateCompanion<Workspace> {
   final Value<String> path;
   final Value<bool> saved;
   final Value<bool> dirty;
+  final Value<bool> error;
   final Value<String?> description;
   final Value<String?> emoji;
   final Value<DateTime> createdAt;
@@ -515,6 +552,7 @@ class WorkspacesCompanion extends UpdateCompanion<Workspace> {
     this.path = const Value.absent(),
     this.saved = const Value.absent(),
     this.dirty = const Value.absent(),
+    this.error = const Value.absent(),
     this.description = const Value.absent(),
     this.emoji = const Value.absent(),
     this.createdAt = const Value.absent(),
@@ -529,6 +567,7 @@ class WorkspacesCompanion extends UpdateCompanion<Workspace> {
     required String path,
     this.saved = const Value.absent(),
     this.dirty = const Value.absent(),
+    this.error = const Value.absent(),
     this.description = const Value.absent(),
     this.emoji = const Value.absent(),
     required DateTime createdAt,
@@ -548,6 +587,7 @@ class WorkspacesCompanion extends UpdateCompanion<Workspace> {
     Expression<String>? path,
     Expression<bool>? saved,
     Expression<bool>? dirty,
+    Expression<bool>? error,
     Expression<String>? description,
     Expression<String>? emoji,
     Expression<DateTime>? createdAt,
@@ -562,6 +602,7 @@ class WorkspacesCompanion extends UpdateCompanion<Workspace> {
       if (path != null) 'path': path,
       if (saved != null) 'saved': saved,
       if (dirty != null) 'dirty': dirty,
+      if (error != null) 'error': error,
       if (description != null) 'description': description,
       if (emoji != null) 'emoji': emoji,
       if (createdAt != null) 'created_at': createdAt,
@@ -578,6 +619,7 @@ class WorkspacesCompanion extends UpdateCompanion<Workspace> {
     Value<String>? path,
     Value<bool>? saved,
     Value<bool>? dirty,
+    Value<bool>? error,
     Value<String?>? description,
     Value<String?>? emoji,
     Value<DateTime>? createdAt,
@@ -592,6 +634,7 @@ class WorkspacesCompanion extends UpdateCompanion<Workspace> {
       path: path ?? this.path,
       saved: saved ?? this.saved,
       dirty: dirty ?? this.dirty,
+      error: error ?? this.error,
       description: description ?? this.description,
       emoji: emoji ?? this.emoji,
       createdAt: createdAt ?? this.createdAt,
@@ -621,6 +664,9 @@ class WorkspacesCompanion extends UpdateCompanion<Workspace> {
     }
     if (dirty.present) {
       map['dirty'] = Variable<bool>(dirty.value);
+    }
+    if (error.present) {
+      map['error'] = Variable<bool>(error.value);
     }
     if (description.present) {
       map['description'] = Variable<String>(description.value);
@@ -652,6 +698,7 @@ class WorkspacesCompanion extends UpdateCompanion<Workspace> {
           ..write('path: $path, ')
           ..write('saved: $saved, ')
           ..write('dirty: $dirty, ')
+          ..write('error: $error, ')
           ..write('description: $description, ')
           ..write('emoji: $emoji, ')
           ..write('createdAt: $createdAt, ')
@@ -681,6 +728,7 @@ typedef $$WorkspacesTableCreateCompanionBuilder = WorkspacesCompanion Function({
   required String path,
   Value<bool> saved,
   Value<bool> dirty,
+  Value<bool> error,
   Value<String?> description,
   Value<String?> emoji,
   required DateTime createdAt,
@@ -695,6 +743,7 @@ typedef $$WorkspacesTableUpdateCompanionBuilder = WorkspacesCompanion Function({
   Value<String> path,
   Value<bool> saved,
   Value<bool> dirty,
+  Value<bool> error,
   Value<String?> description,
   Value<String?> emoji,
   Value<DateTime> createdAt,
@@ -739,6 +788,11 @@ class $$WorkspacesTableFilterComposer
 
   ColumnFilters<bool> get dirty => $composableBuilder(
     column: $table.dirty,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get error => $composableBuilder(
+    column: $table.error,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -807,6 +861,11 @@ class $$WorkspacesTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<bool> get error => $composableBuilder(
+    column: $table.error,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get description => $composableBuilder(
     column: $table.description,
     builder: (column) => ColumnOrderings(column),
@@ -859,6 +918,9 @@ class $$WorkspacesTableAnnotationComposer
 
   GeneratedColumn<bool> get dirty =>
       $composableBuilder(column: $table.dirty, builder: (column) => column);
+
+  GeneratedColumn<bool> get error =>
+      $composableBuilder(column: $table.error, builder: (column) => column);
 
   GeneratedColumn<String> get description => $composableBuilder(
     column: $table.description,
@@ -914,6 +976,7 @@ class $$WorkspacesTableTableManager
                 Value<String> path = const Value.absent(),
                 Value<bool> saved = const Value.absent(),
                 Value<bool> dirty = const Value.absent(),
+                Value<bool> error = const Value.absent(),
                 Value<String?> description = const Value.absent(),
                 Value<String?> emoji = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
@@ -927,6 +990,7 @@ class $$WorkspacesTableTableManager
                 path: path,
                 saved: saved,
                 dirty: dirty,
+                error: error,
                 description: description,
                 emoji: emoji,
                 createdAt: createdAt,
@@ -942,6 +1006,7 @@ class $$WorkspacesTableTableManager
                 required String path,
                 Value<bool> saved = const Value.absent(),
                 Value<bool> dirty = const Value.absent(),
+                Value<bool> error = const Value.absent(),
                 Value<String?> description = const Value.absent(),
                 Value<String?> emoji = const Value.absent(),
                 required DateTime createdAt,
@@ -955,6 +1020,7 @@ class $$WorkspacesTableTableManager
                 path: path,
                 saved: saved,
                 dirty: dirty,
+                error: error,
                 description: description,
                 emoji: emoji,
                 createdAt: createdAt,

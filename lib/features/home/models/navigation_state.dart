@@ -42,7 +42,7 @@ class NavigationState {
   static final defaultState = NavigationState(
     defaultItems: DefaultNavigationData.getDefaultItems,
     currentItem: null,
-    toggled: false,
+    toggled: true,
     defaultActions: DefaultNavigationData.getDefaultActions,
     openedTabs: {},
     currentTab: null,

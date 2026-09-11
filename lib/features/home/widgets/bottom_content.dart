@@ -25,15 +25,29 @@ class BottomContent extends ConsumerWidget {
         children: [
           if (workspaceState != null)
             Flexible(
-              child: Text(
-                workspaceState.selectedEntity == null ||
-                        workspaceState.selectedEntity ==
-                            workspaceState.workspace.path
-                    ? workspaceState.workspace.name
-                    : "${workspaceState.workspace.name}/${p.relative(workspaceState.selectedEntity!, from: workspaceState.workspace.path)}",
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodyMedium,
+              child: Row(
+                children: [
+                  Flexible(
+                    child: Text(
+                      workspaceState.selectedEntity == null ||
+                              workspaceState.selectedEntity ==
+                                  workspaceState.workspace.path
+                          ? workspaceState.workspace.name
+                          : "${workspaceState.workspace.name}/${p.relative(workspaceState.selectedEntity!, from: workspaceState.workspace.path)}",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodyMedium,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+
+                  if (workspaceState.workspace.dirty)
+                    Icon(Icons.circle, size: 10, color: Colors.amber)
+                  else if (workspaceState.workspace.saved)
+                    Icon(Icons.circle, size: 10, color: Colors.green)
+                  else if (workspaceState.workspace.error)
+                    Icon(Icons.circle, size: 10, color: Colors.red),
+                ],
               ),
             ),
 

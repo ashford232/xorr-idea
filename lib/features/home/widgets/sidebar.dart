@@ -50,29 +50,35 @@ class Sidebar extends ConsumerWidget {
 
               userSync.when(
                 data: (user) {
-                  if (user.user == null) {
-                    final localWorkspace = DefaultNavigationData.localWorkspace;
-                    return buildLocalWorkspage(
-                      localWorkspace,
-                      toggled,
-                      currentNavId,
-                      ref,
-                      theme,
-                    );
-                  }
                   final workspace = DefaultNavigationData.workspace;
+                  final localWorkspace = DefaultNavigationData.localWorkspace;
 
-                  return SidebarCard(
-                    text: workspace.name,
-                    icon: workspace.icon!,
-                    toggled: toggled,
-                    isSelected: currentNavId == workspace.id,
+                  return Column(
+                    children: [
+                      if (user.user != null) ...[
+                        SidebarCard(
+                          text: workspace.name,
+                          icon: workspace.icon!,
+                          toggled: toggled,
+                          isSelected: currentNavId == workspace.id,
 
-                    onPressed: () {
-                      ref
-                          .read(navigationStateProvider.notifier)
-                          .chnageNav(workspace);
-                    },
+                          onPressed: () {
+                            ref
+                                .read(navigationStateProvider.notifier)
+                                .chnageNav(workspace);
+                          },
+                        ),
+                      ],
+
+                      //
+                      buildLocalWorkspage(
+                        localWorkspace,
+                        toggled,
+                        currentNavId,
+                        ref,
+                        theme,
+                      ),
+                    ],
                   );
                 },
                 error: (_, _) {

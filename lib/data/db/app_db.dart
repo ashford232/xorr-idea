@@ -14,9 +14,10 @@ class Workspaces extends Table {
 
   TextColumn get path => text().unique()();
 
-  BoolColumn get saved => boolean().withDefault(const Constant(false))();
+  BoolColumn get saved => boolean().withDefault(const Constant(true))();
 
   BoolColumn get dirty => boolean().withDefault(const Constant(false))();
+  BoolColumn get error => boolean().withDefault(const Constant(false))();
 
   TextColumn get description => text().nullable()();
 
