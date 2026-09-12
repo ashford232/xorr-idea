@@ -3,6 +3,7 @@ import 'package:xorr/features/auth/configs/client_config.dart';
 import 'package:xorr/features/auth/configs/token_config.dart';
 import 'package:xorr/features/auth/repositories/auth_repository.dart';
 import 'package:xorr/features/auth/services/upload_service.dart';
+import 'package:xorr/features/workspace/repositories/online_items_repository.dart';
 
 final clientProvider = Provider(
   (ref) => Client(tokenConfig: ref.watch(tokenConfigProvider)),
@@ -17,4 +18,9 @@ final getUserProvider = FutureProvider(
   (ref) => ref.watch(authRepositoryProvider).me(),
 );
 
-final uploadServiceProvider = Provider((ref)=> UploadService(client: ref.watch(clientProvider)));
+final uploadServiceProvider = Provider(
+  (ref) => UploadService(client: ref.watch(clientProvider)),
+);
+final onlineItemsRepositoryProvider = Provider(
+  (ref) => OnlineItemsRepository(client: ref.watch(clientProvider)),
+);

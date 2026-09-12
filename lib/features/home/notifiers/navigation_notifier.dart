@@ -3,7 +3,6 @@ import 'package:xorr/features/home/data/navigation/default_navigation_data.dart'
 import 'package:xorr/features/home/models/navigation_item.dart';
 import 'package:xorr/features/home/models/navigation_state.dart';
 import 'package:xorr/features/home/models/tab_model.dart';
-import 'package:xorr/features/home/view/system_default_view.dart';
 
 class NavigationNotifier extends Notifier<NavigationState> {
   @override
@@ -27,7 +26,7 @@ class NavigationNotifier extends Notifier<NavigationState> {
         emoji: nav.emoji,
         icon: nav.icon,
         name: nav.name,
-        item: nav.page ?? SystemDefaultView(),
+        item: nav.page!,
       ),
     );
   }
@@ -73,9 +72,6 @@ class NavigationNotifier extends Notifier<NavigationState> {
     final all = [
       ...DefaultNavigationData.getDefaultItems,
       DefaultNavigationData.gettingStated,
-      DefaultNavigationData.localWorkspace,
-      DefaultNavigationData.workspace,
-      DefaultNavigationData.account,
     ];
 
     return all.where((nav) => nav.id == id).firstOrNull;

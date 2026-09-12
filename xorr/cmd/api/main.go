@@ -36,24 +36,38 @@ func main() {
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 
+	// Keep authentication endpoints public; the online workspace endpoints below
+	// are protected by the shared bearer-token middleware.
 	r.Post("/register", handler.Signup)
 	r.Post("/login", handler.Login)
+	r.Get("/health", func(w http.ResponseWriter, _ *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusOK)
+		w.Write([]byte(`{"status":"ok"}`))
+	})
 
-	r.Group(func(r chi.Router) {
+	registerOnlineRoutes := func(r chi.Router) {
 		r.Use(customMiddlewares.Authenticate)
 		r.Get("/me", handler.Me)
 
 		r.Post("/me/profile-picture/upload", handler.GetProfileURL)
 		r.Put("/users", handler.UpdateUser)
 
-		r.Get("/notes", handler.GetNotes)
-		r.Post("/notes", handler.CreateNote)
-		r.Put("/notes/{id}", handler.UpdateNote)
-		r.Delete("/notes/{id}", handler.DeleteNote)
-	})
+		r.Get("/items", handler.GetItems)
+		r.Post("/items", handler.CreateItem)
+		r.Put("/items/{id}", handler.UpdateItem)
+		r.Delete("/items/{id}", handler.DeleteItem)
+	}
+
+	// The versioned prefix is the stable contract for the Flutter online client.
+	r.Route("/api/v1", registerOnlineRoutes)
+	// Preserve the original paths while existing clients migrate to /api/v1.
+	r.Group(registerOnlineRoutes)
 	port := ":8080"
 	log.Println("server running: localhost", port)
-	http.ListenAndServe(port, r)
+	if err := http.ListenAndServe(port, r); err != nil {
+		log.Fatalf("server stopped: %v", err)
+	}
 }
 
 func getEnv(key, fallback string) string {

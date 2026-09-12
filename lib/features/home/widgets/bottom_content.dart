@@ -4,10 +4,8 @@ import 'package:xorr/features/auth/models/user_model.dart';
 import 'package:xorr/features/auth/provider/auth_provider.dart';
 import 'package:xorr/features/home/data/navigation/default_navigation_data.dart';
 import 'package:xorr/features/home/providers/navigation_provider.dart';
-import 'package:xorr/features/workspace/provider/workspace_provider.dart';
 import 'package:xorr/shared/extensions/cached_image.dart';
 import 'package:xorr/shared/ui/loaders.dart';
-import 'package:path/path.dart' as p;
 
 class BottomContent extends ConsumerWidget {
   const BottomContent({super.key});
@@ -15,42 +13,13 @@ class BottomContent extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final navigationStateNotifier = ref.watch(navigationStateProvider.notifier);
-    final workspaceState = ref.watch(workspaceProvider).value;
     final userAsync = ref.watch(getUserProvider);
-    final theme = Theme.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: Row(
         mainAxisAlignment: .spaceBetween,
         children: [
-          if (workspaceState != null)
-            Flexible(
-              child: Row(
-                children: [
-                  Flexible(
-                    child: Text(
-                      workspaceState.selectedEntity == null ||
-                              workspaceState.selectedEntity ==
-                                  workspaceState.workspace.path
-                          ? workspaceState.workspace.name
-                          : "${workspaceState.workspace.name}/${p.relative(workspaceState.selectedEntity!, from: workspaceState.workspace.path)}",
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: theme.textTheme.bodyMedium,
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-
-                  if (workspaceState.workspace.dirty)
-                    Icon(Icons.circle, size: 10, color: Colors.amber)
-                  else if (workspaceState.workspace.saved)
-                    Icon(Icons.circle, size: 10, color: Colors.green)
-                  else if (workspaceState.workspace.error)
-                    Icon(Icons.circle, size: 10, color: Colors.red),
-                ],
-              ),
-            ),
-
+    
           userAsync.when(
             data: (user) {
               if (user.user == null) {
@@ -59,7 +28,7 @@ class BottomContent extends ConsumerWidget {
               return _UserProfileTile(
                 userModel: user.user!,
                 onTap: () {
-                  final nav = DefaultNavigationData.account;
+                  final nav = DefaultNavigationData.getDefaultItems[3];
                   navigationStateNotifier.chnageNav(
                     nav.copyWith(emoji: () => user.user?.photoUrl),
                   );

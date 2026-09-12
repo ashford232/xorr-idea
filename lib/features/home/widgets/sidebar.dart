@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:xorr/features/auth/provider/auth_provider.dart';
 import 'package:xorr/features/auth/views/login_view.dart';
-import 'package:xorr/features/home/data/navigation/default_navigation_data.dart';
-import 'package:xorr/features/home/models/navigation_item.dart';
 import 'package:xorr/features/home/providers/navigation_provider.dart';
 import 'package:xorr/shared/consts/app_consts.dart';
 import 'package:xorr/shared/extensions/app_router.dart';
@@ -47,56 +45,6 @@ class Sidebar extends ConsumerWidget {
                     ),
                   ),
                 ),
-
-              userSync.when(
-                data: (user) {
-                  final workspace = DefaultNavigationData.workspace;
-                  final localWorkspace = DefaultNavigationData.localWorkspace;
-
-                  return Column(
-                    children: [
-                      if (user.user != null) ...[
-                        SidebarCard(
-                          text: workspace.name,
-                          icon: workspace.icon!,
-                          toggled: toggled,
-                          isSelected: currentNavId == workspace.id,
-
-                          onPressed: () {
-                            ref
-                                .read(navigationStateProvider.notifier)
-                                .chnageNav(workspace);
-                          },
-                        ),
-                      ],
-
-                      //
-                      buildLocalWorkspage(
-                        localWorkspace,
-                        toggled,
-                        currentNavId,
-                        ref,
-                        theme,
-                      ),
-                    ],
-                  );
-                },
-                error: (_, _) {
-                  final localWorkspace = DefaultNavigationData.localWorkspace;
-                  return buildLocalWorkspage(
-                    localWorkspace,
-                    toggled,
-                    currentNavId,
-                    ref,
-                    theme,
-                  );
-                },
-                loading: () => SidebarCard(
-                  text: "Loading",
-                  icon: Icons.local_activity,
-                  toggled: toggled,
-                ),
-              ),
             ],
           ),
 
@@ -135,7 +83,7 @@ class Sidebar extends ConsumerWidget {
               if (user.user == null) {
                 return SidebarCard(
                   text: 'Login',
-                  icon: CupertinoIcons.person,
+                  icon: Icons.login,
                   toggled: toggled,
                   onPressed: () {
                     AppRouter.push(LoginView());
@@ -180,24 +128,6 @@ class Sidebar extends ConsumerWidget {
           ),
         ],
       ),
-    );
-  }
-
-  SidebarCard buildLocalWorkspage(
-    NavigationItem localWorkspace,
-    bool toggled,
-    int? currentNavId,
-    WidgetRef ref,
-    ThemeData theme,
-  ) {
-    return SidebarCard(
-      text: localWorkspace.name,
-      icon: localWorkspace.icon!,
-      toggled: toggled,
-      isSelected: localWorkspace.id == currentNavId,
-      onPressed: () {
-        ref.read(navigationStateProvider.notifier).chnageNav(localWorkspace);
-      },
     );
   }
 }

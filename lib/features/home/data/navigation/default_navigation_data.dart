@@ -4,11 +4,8 @@ import 'package:xorr/features/home/models/navigation_item.dart';
 import 'package:xorr/features/home/view/default_view.dart';
 import 'package:xorr/features/settings/views/settings_view.dart';
 import 'package:xorr/features/settings/views/user_account.dart';
-import 'package:xorr/features/workspace/views/local_workspace_view.dart';
-import 'package:xorr/features/workspace/views/notifications_view.dart';
 import 'package:xorr/features/workspace/views/favorites_view.dart';
 import 'package:xorr/features/workspace/views/online_workspace_view.dart';
-import 'package:xorr/features/workspace/views/search_view.dart';
 
 class DefaultNavigationData {
   static List<NavigationAction> get getDefaultActions => _defaultAction;
@@ -43,12 +40,11 @@ class DefaultNavigationData {
   static List<NavigationItem> get getDefaultItems => _defaultItems;
   static final List<NavigationItem> _defaultItems = [
     NavigationItem(
-      id: 6,
-      type: .system,
-      name: "Find",
-      icon: CupertinoIcons.search,
-      emoji: null,
-      page: SearchView(),
+      id: 8,
+      type: .user,
+      name: 'Workspace',
+      icon: CupertinoIcons.square_stack_3d_up,
+      page: OnlineWorkspaceView(),
     ),
 
     NavigationItem(
@@ -60,11 +56,12 @@ class DefaultNavigationData {
     ),
 
     NavigationItem(
-      id: 4,
+      id: 11,
       type: .system,
-      name: "Notifications",
-      icon: CupertinoIcons.bell,
-      page: NotificationsView(),
+      name: 'User Account',
+      icon: CupertinoIcons.person,
+
+      page: UserAccount(),
     ),
 
     NavigationItem(
@@ -77,22 +74,6 @@ class DefaultNavigationData {
     ),
   ];
 
-  static final NavigationItem workspace = NavigationItem(
-    id: 8,
-    type: .user,
-    name: 'Workspace',
-    icon: CupertinoIcons.square_stack_3d_up,
-    page: OnlineWorkspaceView(),
-  );
-
-  static final NavigationItem localWorkspace = NavigationItem(
-    id: 9,
-    type: .user,
-    name: 'Local',
-    icon: CupertinoIcons.folder,
-    page: LocalWorkspaceView(),
-  );
-
   static final NavigationItem gettingStated = NavigationItem(
     id: 10,
     type: .system,
@@ -100,12 +81,15 @@ class DefaultNavigationData {
     icon: CupertinoIcons.lightbulb,
     page: DefaultView(),
   );
-  static final NavigationItem account = NavigationItem(
-    id: 11,
-    type: .system,
-    name: 'User Account',
-    icon: CupertinoIcons.person,
+}
 
-    page: UserAccount(),
-  );
+int getPageIndex(int id) {
+  final items = DefaultNavigationData._defaultItems;
+
+  for (final ni in items) {
+    if (ni.id == id) {
+      return items.indexOf(ni);
+    }
+  }
+  return 0;
 }
